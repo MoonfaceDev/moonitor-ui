@@ -5,3 +5,8 @@
             'GRAD' 0,
             'opsz' 48
 }
+
+:root {
+    --button-background: linear-gradient(315deg, rgba(30, 62, 119, 1) 0%, rgba(47, 92, 172, 1) 50%, rgba(112, 48, 160, 1) 100%);
+    --button-background-hover: linear-gradient(315deg, rgba(58, 110, 183, 1) 0%, rgba(86, 152, 229, 1) 50%, rgba(176, 88, 220, 1) 100%);
+}

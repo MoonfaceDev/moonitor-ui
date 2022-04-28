@@ -1,15 +1,29 @@
-import {NetworkEntity, TimePeriod} from "../Utils";
+import {NetworkEntity, TimePeriod, useInterval, useMobile} from "../Utils";
 import Select, {StylesConfig} from "react-select";
-import React, {ReactNode, useEffect, useState} from "react";
-import {fetchLastScan} from "./APIRequests";
+import React, {CSSProperties, ReactNode, useEffect, useState} from "react";
+import {fetchLastScan} from "../APIRequests";
+import {POLL_INTERVAL} from "../config";
+
+function Hover({children, style, disabled}: { children: ReactNode, style?: CSSProperties | undefined, disabled?: boolean }) {
+    const [buttonHover, setButtonHover] = useState(false);
+    return (
+        <div onMouseEnter={() => setButtonHover(true)}
+             onMouseLeave={() => setButtonHover(false)}
+             style={{
+                 ...style,
+                 background: !disabled && buttonHover ? 'rgba(255, 255, 255, 0.1)' : '',
+             }}>{children}</div>
+    );
+}
 
 function PeriodDropdown({period, setPeriod}: { period: TimePeriod, setPeriod: (period: TimePeriod) => void }) {
+    const isMobile = useMobile();
     type Option = { label: string, value: TimePeriod };
     const styles: StylesConfig<Option, false> = {
         container: () => ({
             position: 'absolute',
             right: 32,
-            width: 150,
+            width: isMobile ? 100 : 150,
         }),
     }
     const options = [
@@ -48,8 +62,8 @@ function ChartContainer({children}: { children: ReactNode }) {
     return (
         <div style={{
             position: "relative",
-            flexBasis: 0,
-            flexGrow: 1,
+            flex: '1',
+            minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
             background: '#27293D',
@@ -64,32 +78,34 @@ function ChartContainer({children}: { children: ReactNode }) {
 }
 
 function ChartTitle({children}: { children: ReactNode }) {
+    const isMobile = useMobile();
     return (
         <span style={{
-            fontSize: 24,
+            fontSize: isMobile ? 20 : 24,
             padding: '0 0 0 32px',
         }}>{children}</span>
     );
 }
 
 function DeviceCount() {
+    const isMobile = useMobile();
     const [lastScan, setLastScan] = useState<NetworkEntity[]>([]);
-    useEffect(() => {
+    useInterval(() => {
         fetchLastScan()
             .then(result => {
                 setLastScan(result);
-            })
-    }, []);
+            });
+    }, POLL_INTERVAL, []);
     return (
         <div style={{
             display: 'flex',
             alignItems: 'center',
-            fontSize: 32,
+            fontSize: isMobile ? 24 : 32,
             padding: '0 0 16px 24px',
             color: '#61dafb',
         }}>
                 <span className='material-symbols-outlined' style={{
-                    fontSize: 32,
+                    fontSize: isMobile ? 24 : 32,
                     margin: 8,
                 }}>computer</span>
             <span style={{
@@ -99,4 +115,4 @@ function DeviceCount() {
     );
 }
 
-export {PeriodDropdown, ChartContainer, ChartTitle, DeviceCount};
+export {Hover, PeriodDropdown, ChartContainer, ChartTitle, DeviceCount};

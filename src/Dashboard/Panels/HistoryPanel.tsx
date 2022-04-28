@@ -1,8 +1,9 @@
 import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
-import React, {useEffect, useState} from "react";
-import {TimePeriod} from "../../Utils";
+import React, {useState} from "react";
+import {TimePeriod, useInterval} from "../../Utils";
 import {ChartContainer, ChartTitle, DeviceCount, PeriodDropdown} from "../Components";
-import {fetchHistory} from "../APIRequests";
+import {fetchHistory} from "../../APIRequests";
+import {POLL_INTERVAL} from "../../config";
 
 function formatDate(interval: TimePeriod, date: Date) {
     return date.toLocaleString('en-GB', INTERVAL_TO_FORMAT.get(interval));
@@ -23,19 +24,19 @@ const INTERVAL_TO_FORMAT = new Map<TimePeriod, Intl.DateTimeFormatOptions>([
     [TimePeriod.FiveMinutes, {hour: '2-digit', minute: '2-digit'}],
 ]);
 
-function ConnectedDevicesChart({interval, data}: { interval: TimePeriod, data: { time: Date, average: number }[] }) {
+function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Date, average: number }[] }) {
     const formattedData = formatData(interval, data);
     return (
         <ResponsiveContainer width='100%' height='100%'>
-            <AreaChart data={formattedData} margin={{top: 10, right: 30, left: 0, bottom: 0}}>
+            <AreaChart data={formattedData} margin={{top: 10, right: 60, left: 0, bottom: 0}}>
                 <defs>
                     <linearGradient id='fillColor' x1='0' y1='0' x2='0' y2='1'>
                         <stop offset='5%' stopColor='#00D1FF' stopOpacity={0.3}/>
                         <stop offset='95%' stopColor='#00D1FF' stopOpacity={0}/>
                     </linearGradient>
                 </defs>
-                <XAxis dataKey='time'/>
-                <YAxis/>
+                <XAxis dataKey='time' fontSize={12}/>
+                <YAxis fontSize={12}/>
                 <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)'}}
                          labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}}/>
                 <Area type='monotone' name='average' dataKey='average' stroke='#8884d8' fillOpacity={1}
@@ -54,7 +55,7 @@ const PERIOD_TO_INTERVAL = new Map([
     [TimePeriod.Hour, TimePeriod.FiveMinutes],
 ]);
 
-function ConnectedDevicesPanel() {
+function HistoryPanel() {
     const [history, setHistory] = useState<{ time: Date, average: number }[]>([]);
     const [period, setPeriod] = useState<TimePeriod>(TimePeriod.Day);
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
@@ -67,20 +68,20 @@ function ConnectedDevicesPanel() {
         }
     }
 
-    useEffect(() => {
+    useInterval(() => {
         fetchHistory(period, interval)
             .then(result => {
                 setHistory(result);
             });
-    }, [period, interval]);
+    }, POLL_INTERVAL, [period, interval]);
     return (
         <ChartContainer>
             <PeriodDropdown period={period} setPeriod={setPeriodAndInterval}/>
             <ChartTitle>Connected Devices</ChartTitle>
             <DeviceCount/>
-            <ConnectedDevicesChart interval={interval} data={history}/>
+            <HistoryChart interval={interval} data={history}/>
         </ChartContainer>
     );
 }
 
-export default ConnectedDevicesPanel;
+export default HistoryPanel;
