@@ -1,4 +1,4 @@
-import {Device, NetworkEntity, SpoofedDevice, TimePeriod} from "./Utils";
+import {Device, SpoofedDevice, TimePeriod} from "./Utils";
 
 class APIError extends Error {
     constructor(detail: any) {
@@ -23,7 +23,7 @@ function authHeader() {
 async function fetchHistory(period: TimePeriod = TimePeriod.Day, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, average: number }[]> {
     const response = await fetch(`https://moonitor.sytes.net/history?time_period=${period}&time_interval=${interval}`, {headers: authHeader()});
     const data = await response.json();
-    return data['devices'].map((item: { time: string, average: number }) => ({
+    return data.map((item: { time: string, average: number }) => ({
         time: new Date(item.time),
         average: item.average,
     }));
