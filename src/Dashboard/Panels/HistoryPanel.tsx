@@ -55,7 +55,7 @@ const PERIOD_TO_INTERVAL = new Map([
     [TimePeriod.Hour, TimePeriod.FiveMinutes],
 ]);
 
-function HistoryPanel() {
+function HistoryPanel({onlineCount}: { onlineCount: Number }) {
     const [history, setHistory] = useState<{ time: Date, average: number }[]>([]);
     const [period, setPeriod] = useState<TimePeriod>(TimePeriod.Day);
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
@@ -78,7 +78,7 @@ function HistoryPanel() {
         <ChartContainer>
             <PeriodDropdown period={period} setPeriod={setPeriodAndInterval}/>
             <ChartTitle>Connected Devices</ChartTitle>
-            <DeviceCount/>
+            <DeviceCount onlineCount={onlineCount}/>
             <HistoryChart interval={interval} data={history}/>
         </ChartContainer>
     );

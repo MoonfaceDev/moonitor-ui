@@ -1,9 +1,12 @@
-import React from "react";
+import React, {useState} from "react";
 import logo from "../Assets/logo.png";
 import DeviceTypesPanel from "./Panels/DeviceTypesPanel";
 import HistoryPanel from "./Panels/HistoryPanel";
-import { useMediaQuery } from 'react-responsive';
+import {useMediaQuery} from 'react-responsive';
 import AllDevicesPanel from "./Panels/AllDevicesPanel";
+import {Device, isOnline, useInterval} from "../Utils";
+import {fetchDevices} from "../APIRequests";
+import {POLL_INTERVAL} from "../config";
 
 function Header() {
     return <header style={{height: 100}}>
@@ -20,7 +23,15 @@ function Header() {
 }
 
 function Dashboard() {
-    const isMobile = useMediaQuery({ query: `(max-width: 760px)` });
+    const isMobile = useMediaQuery({query: `(max-width: 760px)`});
+    const [devices, setDevices] = useState<Device[]>([]);
+    const onlineDevices = devices.filter((device) => isOnline(device));
+    useInterval(() => {
+        fetchDevices()
+            .then(result => {
+                setDevices(result);
+            });
+    }, POLL_INTERVAL, []);
     return (
         <div style={{
             display: 'flex',
@@ -34,14 +45,14 @@ function Dashboard() {
             <Header/>
             <div style={{
                 display: 'flex',
-                height: isMobile ? 600: 400,
+                height: isMobile ? 600 : 400,
                 padding: 8,
                 flexDirection: isMobile ? 'column' : 'row',
             }}>
-                <HistoryPanel/>
-                <DeviceTypesPanel/>
+                <HistoryPanel onlineCount={onlineDevices.length}/>
+                <DeviceTypesPanel onlineDevices={onlineDevices}/>
             </div>
-            <AllDevicesPanel/>
+            <AllDevicesPanel devices={devices}/>
         </div>
     );
 }

@@ -1,8 +1,8 @@
 import {
     DEFAULT_SPOOFED_DEVICE,
+    Device,
     getLastSeenTime,
     isOnline,
-    NetworkEntity,
     SpoofedDevice,
     useChangeEffect,
     useMobile
@@ -82,7 +82,7 @@ function DialogBox({children, visible}: { children: ReactNode, visible: boolean 
     );
 }
 
-function OnlineRow({device}: { device: { entity: NetworkEntity, last_online: Date } }) {
+function OnlineRow({device}: { device: Device }) {
     const online = isOnline(device);
     return (
         <div style={{
@@ -114,7 +114,7 @@ function DetailRow({label, value}: { label: string, value: string }) {
     );
 }
 
-function OpenPortsDetail({device}: { device: { entity: NetworkEntity, last_online: Date } }) {
+function OpenPortsDetail({device}: { device: Device }) {
     return (
         <div style={{
             display: "flex",
@@ -162,7 +162,7 @@ function ActionButton({label, disable, active, onToggle}: { label: string, disab
 }
 
 function ActionsRow({device, spoofedDevice, setSpoofedDevice}: {
-    device: { entity: NetworkEntity, last_online: Date },
+    device: Device,
     spoofedDevice: SpoofedDevice,
     setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void,
 }) {
@@ -170,6 +170,7 @@ function ActionsRow({device, spoofedDevice, setSpoofedDevice}: {
     const selfIP = device.entity.ip;
     const isSelf = spoofedDevice.mac === selfMac;
     const disable = !isSelf && spoofedDevice.mac !== '';
+
     function getSpoofedDeviceToSet(forward: boolean) {
         if (isSelf) {
             return DEFAULT_SPOOFED_DEVICE;
@@ -177,20 +178,23 @@ function ActionsRow({device, spoofedDevice, setSpoofedDevice}: {
             return {mac: selfMac, ip: selfIP, forward: forward}
         }
     }
+
     return (
         <div style={{
             display: "flex",
             justifyContent: "center",
             padding: 8,
         }}>
-            <ActionButton label='wifi_off' disable={disable} active={isSelf && !spoofedDevice.forward} onToggle={() => setSpoofedDevice(getSpoofedDeviceToSet(false))}/>
-            <ActionButton label='travel_explore' disable={disable} active={isSelf && spoofedDevice.forward} onToggle={() => setSpoofedDevice(getSpoofedDeviceToSet(true))}/>
+            <ActionButton label='wifi_off' disable={disable} active={isSelf && !spoofedDevice.forward}
+                          onToggle={() => setSpoofedDevice(getSpoofedDeviceToSet(false))}/>
+            <ActionButton label='travel_explore' disable={disable} active={isSelf && spoofedDevice.forward}
+                          onToggle={() => setSpoofedDevice(getSpoofedDeviceToSet(true))}/>
         </div>
     );
 }
 
 function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
-    device: { entity: NetworkEntity, last_online: Date },
+    device: Device,
     spoofedDevice: SpoofedDevice,
     setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void,
 }) {
@@ -229,7 +233,7 @@ function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
 }
 
 function DeviceDetailsPanel({device, spoofedDevice, setSpoofedDevice, visible, closePanel}: {
-    device: { entity: NetworkEntity, last_online: Date },
+    device: Device,
     spoofedDevice: SpoofedDevice,
     setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void,
     visible: boolean,
