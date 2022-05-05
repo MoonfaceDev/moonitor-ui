@@ -19,11 +19,9 @@ enum TimePeriod {
 
 type NetworkEntity = {
     ip: string,
-    device: {
-        mac: string,
-        name: string,
-        type: string
-    }
+    mac: string,
+    name: string,
+    type: string
     vendor: string,
     open_ports: [number, string][]
 }

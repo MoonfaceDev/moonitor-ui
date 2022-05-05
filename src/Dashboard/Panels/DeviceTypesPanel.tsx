@@ -20,7 +20,7 @@ const COLORS = [
 function countEntitiesOfType(onlineDevices: Device[], type: string) {
     let count = 0;
     onlineDevices.forEach(device => {
-        if (device.entity.device.type === type) {
+        if (device.entity.type === type) {
             count++;
         }
     });
@@ -29,7 +29,7 @@ function countEntitiesOfType(onlineDevices: Device[], type: string) {
 
 function getTypeSet(onlineDevices: Device[]) {
     const types = new Set<string>();
-    onlineDevices.forEach(device => types.add(device.entity.device.type));
+    onlineDevices.forEach(device => types.add(device.entity.type));
     return types;
 }
 

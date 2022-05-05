@@ -166,7 +166,7 @@ function ActionsRow({device, spoofedDevice, setSpoofedDevice}: {
     spoofedDevice: SpoofedDevice,
     setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void,
 }) {
-    const selfMac = device.entity.device.mac;
+    const selfMac = device.entity.mac;
     const selfIP = device.entity.ip;
     const isSelf = spoofedDevice.mac === selfMac;
     const disable = !isSelf && spoofedDevice.mac !== '';
@@ -210,7 +210,7 @@ function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
                 margin: 16
             }}/>
             <DetailRow label='IP Address' value={device.entity.ip}/>
-            <DetailRow label='MAC Address' value={device.entity.device.mac}/>
+            <DetailRow label='MAC Address' value={device.entity.mac}/>
             <DetailRow label='MAC Vendor' value={device.entity.vendor}/>
             {
                 device.entity.open_ports.length > 0 ?
@@ -241,7 +241,7 @@ function DeviceDetailsPanel({device, spoofedDevice, setSpoofedDevice, visible, c
 }) {
     return (
         <DialogBox visible={visible}>
-            <DetailsHeader title={device.entity.device.name} closePanel={closePanel}/>
+            <DetailsHeader title={device.entity.name} closePanel={closePanel}/>
             <DetailsContent device={device} spoofedDevice={spoofedDevice} setSpoofedDevice={setSpoofedDevice}/>
         </DialogBox>
     );
