@@ -1,13 +1,21 @@
 import React, {useEffect, useState} from "react";
-import {fetchDevices, fetchSpoof, fetchSpoofedDevice} from "../../APIRequests";
-import {getLastSeenTime, isOnline, NetworkEntity, SpoofedDevice, useInterval, useMobile} from "../../Utils";
+import {fetchSpoof, fetchSpoofedDevice} from "../../APIRequests";
+import {
+    DEFAULT_SPOOFED_DEVICE,
+    Device,
+    getLastSeenTime,
+    isOnline,
+    sortDevices,
+    SpoofedDevice,
+    useMobile
+} from "../../Utils";
 import DeviceDetailsPanel from "./DeviceDetailsPanel";
 import Loading from "../../Loading/Loading";
-import {POLL_INTERVAL, TYPE_TO_ICON} from "../../config";
+import {TYPE_TO_ICON} from "../../config";
 import {Hover} from "../Components";
 
 function DeviceView({device, spoofedDevice, setSpoofedDevice}: {
-    device: { entity: NetworkEntity, last_online: Date },
+    device: Device,
     spoofedDevice: SpoofedDevice,
     setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void
 }) {
@@ -41,7 +49,7 @@ function DeviceView({device, spoofedDevice, setSpoofedDevice}: {
                         padding: 12,
                         fontSize: 40,
                     }}>
-                        {TYPE_TO_ICON.get(device.entity.device.type)}
+                        {TYPE_TO_ICON.get(device.entity.type)}
                         {
                             online ?
                                 <div style={{
@@ -63,7 +71,7 @@ function DeviceView({device, spoofedDevice, setSpoofedDevice}: {
                         flexGrow: 1,
                         fontSize: 14,
                     }}>
-                        <span style={{fontSize: 16}}><b>{device.entity.device.name}</b></span>
+                        <span style={{fontSize: 16}}><b>{device.entity.name}</b></span>
                         <span>{device.entity.ip}</span>
                         <span style={{marginTop: 4}}>{online ? 'Online' : 'Last seen ' + getLastSeenTime(device)}</span>
                     </div>
@@ -73,10 +81,9 @@ function DeviceView({device, spoofedDevice, setSpoofedDevice}: {
     );
 }
 
-function AllDevicesPanel() {
+function AllDevicesPanel({devices}: { devices: Device[] }) {
     const isMobile = useMobile();
-    const [devices, setDevices] = useState<{ entity: NetworkEntity, last_online: Date }[]>([]);
-    const [spoofedDevice, setSpoofedDevice] = useState<SpoofedDevice>({mac: '', ip: '', forward: false});
+    const [spoofedDevice, setSpoofedDevice] = useState<SpoofedDevice>(DEFAULT_SPOOFED_DEVICE);
     const [loadingVisible, setLoadingVisible] = useState(false);
 
     function setSpoofedDeviceAndSend(spoofedDevice: SpoofedDevice) {
@@ -92,15 +99,8 @@ function AllDevicesPanel() {
             });
     }
 
-    useInterval(() => {
-        fetchDevices()
-            .then(result => {
-                const sortedResult = result.sort((entity1, entity2) => {
-                    return entity2.last_online.getTime() - entity1.last_online.getTime();
-                });
-                setDevices(sortedResult);
-            });
-    }, POLL_INTERVAL, []);
+    const sortedDevices = sortDevices(devices);
+
     useEffect(() => {
         fetchSpoofedDevice()
             .then(result => {
@@ -119,9 +119,9 @@ function AllDevicesPanel() {
                 padding: '16px 0',
             }}>
                 {
-                    devices.map(device => <DeviceView key={device.entity.device.mac} device={device}
-                                                      spoofedDevice={spoofedDevice}
-                                                      setSpoofedDevice={setSpoofedDeviceAndSend}/>)
+                    sortedDevices.map(device => <DeviceView key={device.entity.mac} device={device}
+                                                            spoofedDevice={spoofedDevice}
+                                                            setSpoofedDevice={setSpoofedDeviceAndSend}/>)
                 }
             </div>
         </>

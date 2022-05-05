@@ -3,7 +3,7 @@ import moment from "moment";
 import {DependencyList, EffectCallback, useEffect, useRef} from "react";
 
 function useMobile() {
-    return useMediaQuery({ query: `(max-width: 760px)` });
+    return useMediaQuery({query: `(max-width: 760px)`});
 }
 
 enum TimePeriod {
@@ -19,13 +19,17 @@ enum TimePeriod {
 
 type NetworkEntity = {
     ip: string,
-    device: {
-        mac: string,
-        name: string,
-        type: string
-    }
+    mac: string,
+    hostname: string,
+    name: string,
+    type: string
     vendor: string,
     open_ports: [number, string][]
+}
+
+type Device = {
+    entity: NetworkEntity,
+    last_online: Date
 }
 
 type SpoofedDevice = {
@@ -55,11 +59,17 @@ function useInterval(func: () => void, timeInterval: number, deps?: DependencyLi
 
 const ONLINE_THRESHOLD = 10 * 60 * 1000;
 
-function isOnline(device: { entity: NetworkEntity, last_online: Date }) {
+function sortDevices(devices: Device[]) {
+    return devices.sort((entity1, entity2) => {
+        return entity2.last_online.getTime() - entity1.last_online.getTime();
+    });
+}
+
+function isOnline(device: Device) {
     return Date.now() - device.last_online.getTime() < ONLINE_THRESHOLD;
 }
 
-function getLastSeenTime(device: { entity: NetworkEntity, last_online: Date }) {
+function getLastSeenTime(device: Device) {
     return moment(device.last_online).calendar({
         sameDay: '[today at] HH:mm',
         lastDay: '[yesterday at] HH:mm',
@@ -68,5 +78,14 @@ function getLastSeenTime(device: { entity: NetworkEntity, last_online: Date }) {
     });
 }
 
-export {useMobile, useChangeEffect, useInterval, TimePeriod, isOnline, getLastSeenTime, DEFAULT_SPOOFED_DEVICE};
-export type {NetworkEntity, SpoofedDevice};
+export {
+    useMobile,
+    useChangeEffect,
+    useInterval,
+    TimePeriod,
+    sortDevices,
+    isOnline,
+    getLastSeenTime,
+    DEFAULT_SPOOFED_DEVICE
+};
+export type {NetworkEntity, Device, SpoofedDevice};

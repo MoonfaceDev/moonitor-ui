@@ -1,8 +1,6 @@
-import {NetworkEntity, TimePeriod, useInterval, useMobile} from "../Utils";
+import {TimePeriod, useMobile} from "../Utils";
 import Select, {StylesConfig} from "react-select";
-import React, {CSSProperties, ReactNode, useEffect, useState} from "react";
-import {fetchLastScan} from "../APIRequests";
-import {POLL_INTERVAL} from "../config";
+import React, {CSSProperties, ReactNode, useState} from "react";
 
 function Hover({children, style, disabled}: { children: ReactNode, style?: CSSProperties | undefined, disabled?: boolean }) {
     const [buttonHover, setButtonHover] = useState(false);
@@ -87,15 +85,8 @@ function ChartTitle({children}: { children: ReactNode }) {
     );
 }
 
-function DeviceCount() {
+function DeviceCount({onlineCount}: { onlineCount: Number }) {
     const isMobile = useMobile();
-    const [lastScan, setLastScan] = useState<NetworkEntity[]>([]);
-    useInterval(() => {
-        fetchLastScan()
-            .then(result => {
-                setLastScan(result);
-            });
-    }, POLL_INTERVAL, []);
     return (
         <div style={{
             display: 'flex',
@@ -110,7 +101,7 @@ function DeviceCount() {
                 }}>computer</span>
             <span style={{
                 margin: 8,
-            }}>{lastScan.length}</span>
+            }}>{onlineCount.toString()}</span>
         </div>
     );
 }
