@@ -114,6 +114,14 @@ function DetailRow({label, value}: { label: string, value: string }) {
     );
 }
 
+function ConditionalDetailRow({label, value}: { label: string, value: string }) {
+    return (
+        value
+            ? <DetailRow label={label} value={value}/>
+            : null
+    )
+}
+
 function OpenPortsDetail({device}: { device: Device }) {
     return (
         <div style={{
@@ -209,9 +217,10 @@ function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
                 flexGrow: 1,
                 margin: 16
             }}/>
-            <DetailRow label='IP Address' value={device.entity.ip}/>
-            <DetailRow label='MAC Address' value={device.entity.mac}/>
-            <DetailRow label='MAC Vendor' value={device.entity.vendor}/>
+            <ConditionalDetailRow label='IP Address' value={device.entity.ip}/>
+            <ConditionalDetailRow label='Hostname' value={device.entity.hostname}/>
+            <ConditionalDetailRow label='MAC Address' value={device.entity.mac}/>
+            <ConditionalDetailRow label='MAC Vendor' value={device.entity.vendor}/>
             {
                 device.entity.open_ports.length > 0 ?
                     <>

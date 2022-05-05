@@ -20,6 +20,7 @@ enum TimePeriod {
 type NetworkEntity = {
     ip: string,
     mac: string,
+    hostname: string,
     name: string,
     type: string
     vendor: string,
