@@ -7,7 +7,7 @@ import AllDevicesPanel from "./Panels/AllDevicesPanel";
 import {Device, isOnline, useInterval} from "../Utils";
 import {fetchDevices} from "../APIRequests";
 import {POLL_INTERVAL} from "../config";
-import {useNavigate} from "react-router-dom";
+import {Navigate} from "react-router-dom";
 
 function Header() {
     return <header style={{height: 100}}>
@@ -24,18 +24,19 @@ function Header() {
 }
 
 function Dashboard() {
-    const navigate = useNavigate();
     const isMobile = useMediaQuery({query: `(max-width: 760px)`});
     const [devices, setDevices] = useState<Device[]>([]);
+    const [shouldLogin, setShouldLogin] = useState<boolean>(false);
     const onlineDevices = devices.filter((device) => isOnline(device));
     useInterval(() => {
         fetchDevices()
             .then(result => {
                 setDevices(result);
+                setShouldLogin(false);
             })
             .catch(reason => {
                 console.error(reason);
-                navigate('/login');
+                setShouldLogin(true);
             });
     }, POLL_INTERVAL, []);
     return (
@@ -48,6 +49,7 @@ function Dashboard() {
             fontFamily: 'Plus Jakarta Sans, sans-serif',
             padding: isMobile ? 0 : '0 300px',
         }}>
+            {shouldLogin ? <Navigate to="/login"/> : null}
             <Header/>
             <div style={{
                 display: 'flex',

@@ -74,10 +74,6 @@ function HistoryPanel({onlineCount}: { onlineCount: Number }) {
         fetchHistory(period, interval)
             .then(result => {
                 setHistory(result);
-            })
-            .catch(reason => {
-                console.error(reason);
-                navigate('/login');
             });
     }, POLL_INTERVAL, [period, interval]);
     return (

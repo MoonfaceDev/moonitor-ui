@@ -38,6 +38,10 @@ type SpoofedDevice = {
     forward: boolean
 }
 
+const DEFAULT_DEVICE: Device = {
+    entity: {ip: '', mac: '', hostname: '', name: '', type: '', vendor: '', open_ports: []},
+    last_online: new Date()
+};
 const DEFAULT_SPOOFED_DEVICE: SpoofedDevice = {mac: '', ip: '', forward: false};
 
 const useChangeEffect = (func: EffectCallback, deps: DependencyList) => {
@@ -86,6 +90,7 @@ export {
     sortDevices,
     isOnline,
     getLastSeenTime,
+    DEFAULT_DEVICE,
     DEFAULT_SPOOFED_DEVICE
 };
 export type {NetworkEntity, Device, SpoofedDevice};
