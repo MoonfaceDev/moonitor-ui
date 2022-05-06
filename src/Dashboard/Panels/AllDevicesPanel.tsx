@@ -33,6 +33,7 @@ function DeviceView({device, spoofedDevice, setSpoofedDevice}: {
                      color: '#D3D1D8',
                      borderRadius: 16,
                      margin: 8,
+                     userSelect: "none",
                  }}>
                 <Hover style={{
                     display: 'flex',

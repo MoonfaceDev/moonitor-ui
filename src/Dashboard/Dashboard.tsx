@@ -7,6 +7,7 @@ import AllDevicesPanel from "./Panels/AllDevicesPanel";
 import {Device, isOnline, useInterval} from "../Utils";
 import {fetchDevices} from "../APIRequests";
 import {POLL_INTERVAL} from "../config";
+import {useNavigate} from "react-router-dom";
 
 function Header() {
     return <header style={{height: 100}}>
@@ -23,6 +24,7 @@ function Header() {
 }
 
 function Dashboard() {
+    const navigate = useNavigate();
     const isMobile = useMediaQuery({query: `(max-width: 760px)`});
     const [devices, setDevices] = useState<Device[]>([]);
     const onlineDevices = devices.filter((device) => isOnline(device));
@@ -30,6 +32,10 @@ function Dashboard() {
         fetchDevices()
             .then(result => {
                 setDevices(result);
+            })
+            .catch(reason => {
+                console.error(reason);
+                navigate('/login');
             });
     }, POLL_INTERVAL, []);
     return (
