@@ -7,16 +7,29 @@ import {
     useChangeEffect,
     useMobile
 } from "../../Utils";
-import React, {ReactNode, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import {Hover} from "../Components";
 
 function DetailsHeader({title, closePanel}: { title: string, closePanel: () => void }) {
     return (
         <div style={{
+            position: "relative",
             display: "flex",
             alignItems: "center",
         }}>
-            <Hover style={{margin: 8, borderRadius: '50%'}}>
+            <span style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                padding: '8px 56px',
+                color: 'white',
+                fontSize: 20,
+                textAlign: 'center',
+                width: "100%",
+            }}>
+                        <b>{title}</b>
+                    </span>
+            <Hover style={{margin: 8, borderRadius: '50%', zIndex: 1}}>
                         <span className='material-symbols-outlined'
                               onClick={() => closePanel()}
                               style={{
@@ -25,16 +38,6 @@ function DetailsHeader({title, closePanel}: { title: string, closePanel: () => v
                                   padding: 4,
                               }}>close</span>
             </Hover>
-            <span style={{
-                position: 'absolute',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                padding: 8,
-                color: 'white',
-                fontSize: 20,
-            }}>
-                        <b>{title}</b>
-                    </span>
         </div>
     );
 }
@@ -248,6 +251,19 @@ function DeviceDetailsPanel({device, spoofedDevice, setSpoofedDevice, visible, c
     visible: boolean,
     closePanel: () => void
 }) {
+    useEffect(() => {
+        const close = (event: { keyCode: number; }) => {
+            if (event.keyCode === 27) {
+                closePanel();
+            }
+        }
+        if (visible) {
+            window.addEventListener('keydown', close);
+        } else {
+            window.removeEventListener('keydown', close);
+        }
+        return () => window.removeEventListener('keydown', close);
+    }, [visible]);
     return (
         <DialogBox visible={visible}>
             <DetailsHeader title={device.entity.name} closePanel={closePanel}/>

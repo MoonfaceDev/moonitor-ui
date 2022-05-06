@@ -1,5 +1,7 @@
 import {Device, SpoofedDevice, TimePeriod} from "./Utils";
 
+const ORIGIN = '<origin>';
+
 class APIError extends Error {
     constructor(detail: any) {
         console.log(detail);
@@ -21,7 +23,7 @@ function authHeader() {
 }
 
 async function fetchHistory(period: TimePeriod = TimePeriod.Day, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, average: number }[]> {
-    const response = await fetch(`https://moonitor.sytes.net/history?time_period=${period}&time_interval=${interval}`, {headers: authHeader()});
+    const response = await fetch(`${ORIGIN}/history?time_period=${period}&time_interval=${interval}`, {headers: authHeader()});
     const data = await response.json();
     return data.map((item: { time: string, average: number }) => ({
         time: new Date(item.time),
@@ -30,7 +32,7 @@ async function fetchHistory(period: TimePeriod = TimePeriod.Day, interval: TimeP
 }
 
 async function fetchDevices(): Promise<Device[]> {
-    const response = await fetch(`https://moonitor.sytes.net/devices`, {headers: authHeader()});
+    const response = await fetch(`${ORIGIN}/devices`, {headers: authHeader()});
     const data = await response.json();
     return data.map((device: Device) => ({
         entity: device.entity,
@@ -39,20 +41,20 @@ async function fetchDevices(): Promise<Device[]> {
 }
 
 async function fetchSpoofedDevice(): Promise<SpoofedDevice> {
-    const response = await fetch(`https://moonitor.sytes.net/spoofed_device`, {headers: authHeader()});
+    const response = await fetch(`${ORIGIN}/spoofed_device`, {headers: authHeader()});
     return await response.json();
 }
 
 async function fetchSpoof(spoofedDevice: SpoofedDevice) {
     if (spoofedDevice.mac === '') {
         const response = await fetch(
-            `https://moonitor.sytes.net/spoof/stop`,
+            `${ORIGIN}/spoof/stop`,
             {method: 'post', headers: authHeader()}
         );
         return response.status;
     } else {
         const response = await fetch(
-            `https://moonitor.sytes.net/spoof/start?ip=${spoofedDevice.ip}&mac=${spoofedDevice.mac}&forward=${spoofedDevice.forward}`,
+            `${ORIGIN}/spoof/start?ip=${spoofedDevice.ip}&mac=${spoofedDevice.mac}&forward=${spoofedDevice.forward}`,
             {method: 'post', headers: authHeader()}
         );
         return response.status;
@@ -60,7 +62,7 @@ async function fetchSpoof(spoofedDevice: SpoofedDevice) {
 }
 
 async function fetchCheckToken() {
-    const response = await fetch(`https://moonitor.sytes.net/check_token`, {headers: authHeader()});
+    const response = await fetch(`${ORIGIN}/check_token`, {headers: authHeader()});
     return response.status === 200;
 }
 
@@ -70,7 +72,7 @@ async function fetchLogin(email: string, password: string) {
         ['password', password],
     ]);
     const response = await fetch(
-        `https://moonitor.sytes.net/login/token`,
+        `${ORIGIN}/login/token`,
         {
             method: 'post',
             body: data,
@@ -89,7 +91,7 @@ async function fetchRegister(fullName: string, email: string, password: string) 
         ['password', password],
     ]);
     const response = await fetch(
-        `https://moonitor.sytes.net/register/token`,
+        `${ORIGIN}/register/token`,
         {
             method: 'post',
             body: data,

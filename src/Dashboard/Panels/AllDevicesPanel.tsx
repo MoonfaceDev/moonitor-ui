@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {fetchSpoof, fetchSpoofedDevice} from "../../APIRequests";
 import {
+    DEFAULT_DEVICE,
     DEFAULT_SPOOFED_DEVICE,
     Device,
     getLastSeenTime,
@@ -14,25 +15,22 @@ import Loading from "../../Loading/Loading";
 import {TYPE_TO_ICON} from "../../config";
 import {Hover} from "../Components";
 
-function DeviceView({device, spoofedDevice, setSpoofedDevice}: {
+function DeviceView({device, spoofedDevice, openDetails}: {
     device: Device,
     spoofedDevice: SpoofedDevice,
-    setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void
+    openDetails: () => void
 }) {
-    const [detailsVisible, setDetailsVisible] = useState(false);
     const online = isOnline(device);
     return (
         <>
-            <DeviceDetailsPanel device={device} spoofedDevice={spoofedDevice} setSpoofedDevice={setSpoofedDevice}
-                                visible={detailsVisible}
-                                closePanel={() => setDetailsVisible(false)}/>
-            <div onClick={() => setDetailsVisible(true)}
+            <div onClick={openDetails}
                  style={{
                      display: 'flex',
                      background: '#27293D',
                      color: '#D3D1D8',
                      borderRadius: 16,
                      margin: 8,
+                     userSelect: "none",
                  }}>
                 <Hover style={{
                     display: 'flex',
@@ -85,6 +83,8 @@ function AllDevicesPanel({devices}: { devices: Device[] }) {
     const isMobile = useMobile();
     const [spoofedDevice, setSpoofedDevice] = useState<SpoofedDevice>(DEFAULT_SPOOFED_DEVICE);
     const [loadingVisible, setLoadingVisible] = useState(false);
+    const [detailsVisible, setDetailsVisible] = useState(false);
+    const [selectedDevice, setSelectedDevice] = useState<Device>(DEFAULT_DEVICE);
 
     function setSpoofedDeviceAndSend(spoofedDevice: SpoofedDevice) {
         setLoadingVisible(true);
@@ -110,6 +110,10 @@ function AllDevicesPanel({devices}: { devices: Device[] }) {
     return (
         <>
             <Loading visible={loadingVisible}/>
+            <DeviceDetailsPanel device={selectedDevice} spoofedDevice={spoofedDevice}
+                                setSpoofedDevice={setSpoofedDeviceAndSend}
+                                visible={detailsVisible}
+                                closePanel={() => setDetailsVisible(false)}/>
             <div id='grid' style={{
                 display: 'grid',
                 gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr 1fr',
@@ -121,7 +125,10 @@ function AllDevicesPanel({devices}: { devices: Device[] }) {
                 {
                     sortedDevices.map(device => <DeviceView key={device.entity.mac} device={device}
                                                             spoofedDevice={spoofedDevice}
-                                                            setSpoofedDevice={setSpoofedDeviceAndSend}/>)
+                                                            openDetails={() => {
+                                                                setSelectedDevice(device);
+                                                                setDetailsVisible(true);
+                                                            }}/>)
                 }
             </div>
         </>
