@@ -17,6 +17,7 @@ function RequireToken({children}: { children: any }) {
     try {
         const user = JSON.parse(localStorage.getItem('user') as string);
         if (!(user && user.access_token && isValid)) {
+            console.warn('Invalid token!');
             return navigate;
         }
         return children;
