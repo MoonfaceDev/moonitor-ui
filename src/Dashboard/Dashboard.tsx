@@ -4,10 +4,10 @@ import DeviceTypesPanel from "./Panels/DeviceTypesPanel";
 import HistoryPanel from "./Panels/HistoryPanel";
 import {useMediaQuery} from 'react-responsive';
 import AllDevicesPanel from "./Panels/AllDevicesPanel";
-import {Device, isOnline, useInterval} from "../Utils";
+import {Device, getTokenExpirationDelta, isOnline, useInterval, useTimeout} from "../Utils";
 import {fetchDevices} from "../APIRequests";
 import {POLL_INTERVAL} from "../config";
-import {Navigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 
 function Header() {
     return <header style={{height: 100}}>
@@ -26,19 +26,21 @@ function Header() {
 function Dashboard() {
     const isMobile = useMediaQuery({query: `(max-width: 760px)`});
     const [devices, setDevices] = useState<Device[]>([]);
-    const [shouldLogin, setShouldLogin] = useState<boolean>(false);
     const onlineDevices = devices.filter((device) => isOnline(device));
+    const navigate = useNavigate();
     useInterval(() => {
         fetchDevices()
             .then(result => {
                 setDevices(result);
-                setShouldLogin(false);
             })
             .catch(reason => {
                 console.error(reason);
-                setShouldLogin(true);
             });
     }, POLL_INTERVAL, []);
+    useTimeout(() => {
+        console.warn('Token expired');
+        navigate('/login');
+    }, getTokenExpirationDelta());
     return (
         <div style={{
             display: 'flex',
@@ -49,7 +51,6 @@ function Dashboard() {
             fontFamily: 'Plus Jakarta Sans, sans-serif',
             padding: isMobile ? 0 : '0 300px',
         }}>
-            {shouldLogin ? <Navigate to="/login"/> : null}
             <Header/>
             <div style={{
                 display: 'flex',

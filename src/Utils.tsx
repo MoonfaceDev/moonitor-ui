@@ -53,12 +53,26 @@ const useChangeEffect = (func: EffectCallback, deps: DependencyList) => {
     }, deps);
 }
 
+function useTimeout(func: () => void, time: number, deps?: DependencyList | undefined) {
+    useEffect(() => {
+        const intervalID = window.setTimeout(func, time);
+        return () => window.clearTimeout(intervalID);
+    }, deps);
+}
+
 function useInterval(func: () => void, timeInterval: number, deps?: DependencyList | undefined) {
     useEffect(() => {
         func();
         const intervalID = window.setInterval(func, timeInterval);
         return () => window.clearInterval(intervalID);
     }, deps);
+}
+
+function getTokenExpirationDelta() {
+    const user = localStorage.user;
+    const token = JSON.parse(user).access_token;
+    const exp = JSON.parse(atob(token.split('.')[1])).exp;
+    return exp * 1000 - Date.now();
 }
 
 const ONLINE_THRESHOLD = 10 * 60 * 1000;
@@ -85,7 +99,9 @@ function getLastSeenTime(device: Device) {
 export {
     useMobile,
     useChangeEffect,
+    useTimeout,
     useInterval,
+    getTokenExpirationDelta,
     TimePeriod,
     sortDevices,
     isOnline,
