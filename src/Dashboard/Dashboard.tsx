@@ -7,7 +7,7 @@ import AllDevicesPanel from "./Panels/AllDevicesPanel";
 import {Device, getTokenExpirationDelta, isOnline, useInterval, useTimeout} from "../Utils";
 import {fetchDevices} from "../APIRequests";
 import {POLL_INTERVAL} from "../config";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 function Header() {
     return <header style={{height: 100}}>

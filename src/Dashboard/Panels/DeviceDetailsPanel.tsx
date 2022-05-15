@@ -136,8 +136,8 @@ function OpenPortsDetail({device}: { device: Device }) {
             textAlign: "center",
         }}>Open Ports</span>
             {
-                device.entity.open_ports.map(open_port => {
-                    return <DetailRow key={open_port[0]} label={open_port[0].toString()} value={open_port[1]}/>
+                device.open_ports.map(open_port => {
+                    return <DetailRow key={open_port.port} label={open_port.port.toString()} value={open_port.service}/>
                 })
             }
         </div>
@@ -177,8 +177,8 @@ function ActionsRow({device, spoofedDevice, setSpoofedDevice}: {
     spoofedDevice: SpoofedDevice,
     setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void,
 }) {
-    const selfMac = device.entity.mac;
-    const selfIP = device.entity.ip;
+    const selfMac = device.mac;
+    const selfIP = device.ip;
     const isSelf = spoofedDevice.mac === selfMac;
     const disable = !isSelf && spoofedDevice.mac !== '';
 
@@ -220,12 +220,12 @@ function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
                 flexGrow: 1,
                 margin: 16
             }}/>
-            <ConditionalDetailRow label='IP Address' value={device.entity.ip}/>
-            <ConditionalDetailRow label='Hostname' value={device.entity.hostname}/>
-            <ConditionalDetailRow label='MAC Address' value={device.entity.mac}/>
-            <ConditionalDetailRow label='MAC Vendor' value={device.entity.vendor}/>
+            <ConditionalDetailRow label='IP Address' value={device.ip}/>
+            <ConditionalDetailRow label='Hostname' value={device.hostname}/>
+            <ConditionalDetailRow label='MAC Address' value={device.mac}/>
+            <ConditionalDetailRow label='MAC Vendor' value={device.vendor}/>
             {
-                device.entity.open_ports.length > 0 ?
+                device.open_ports.length > 0 ?
                     <>
                         <hr style={{
                             flexGrow: 1,
@@ -266,7 +266,7 @@ function DeviceDetailsPanel({device, spoofedDevice, setSpoofedDevice, visible, c
     }, [visible]);
     return (
         <DialogBox visible={visible}>
-            <DetailsHeader title={device.entity.name} closePanel={closePanel}/>
+            <DetailsHeader title={device.name} closePanel={closePanel}/>
             <DetailsContent device={device} spoofedDevice={spoofedDevice} setSpoofedDevice={setSpoofedDevice}/>
         </DialogBox>
     );

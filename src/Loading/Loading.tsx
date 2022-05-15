@@ -23,7 +23,7 @@ function Loading({visible}: { visible: boolean }) {
             height: 80,
             userSelect: 'none',
             pointerEvents: 'none',
-        }} src={loading}/>
+        }} src={loading} alt='Loading'/>
     </div>
 }
 

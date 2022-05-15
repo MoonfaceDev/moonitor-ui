@@ -47,7 +47,7 @@ function DeviceView({device, spoofedDevice, openDetails}: {
                         padding: 12,
                         fontSize: 40,
                     }}>
-                        {TYPE_TO_ICON.get(device.entity.type)}
+                        {TYPE_TO_ICON.get(device.type)}
                         {
                             online ?
                                 <div style={{
@@ -69,8 +69,8 @@ function DeviceView({device, spoofedDevice, openDetails}: {
                         flexGrow: 1,
                         fontSize: 14,
                     }}>
-                        <span style={{fontSize: 16}}><b>{device.entity.name}</b></span>
-                        <span>{device.entity.ip}</span>
+                        <span style={{fontSize: 16}}><b>{device.name}</b></span>
+                        <span>{device.ip}</span>
                         <span style={{marginTop: 4}}>{online ? 'Online' : 'Last seen ' + getLastSeenTime(device)}</span>
                     </div>
                 </Hover>
@@ -123,7 +123,7 @@ function AllDevicesPanel({devices}: { devices: Device[] }) {
                 padding: '16px 0',
             }}>
                 {
-                    sortedDevices.map(device => <DeviceView key={device.entity.mac} device={device}
+                    sortedDevices.map(device => <DeviceView key={device.mac} device={device}
                                                             spoofedDevice={spoofedDevice}
                                                             openDetails={() => {
                                                                 setSelectedDevice(device);

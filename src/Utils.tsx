@@ -17,19 +17,20 @@ enum TimePeriod {
     FiveMinutes = 5 * 60,
 }
 
-type NetworkEntity = {
-    ip: string,
-    mac: string,
-    hostname: string,
-    name: string,
-    type: string
-    vendor: string,
-    open_ports: [number, string][]
+type PortInfo = {
+    port: number,
+    service: string
 }
 
 type Device = {
-    entity: NetworkEntity,
     last_online: Date
+    name: string,
+    type: string
+    ip: string,
+    hostname: string,
+    mac: string,
+    vendor: string,
+    open_ports: PortInfo[]
 }
 
 type SpoofedDevice = {
@@ -39,10 +40,21 @@ type SpoofedDevice = {
 }
 
 const DEFAULT_DEVICE: Device = {
-    entity: {ip: '', mac: '', hostname: '', name: '', type: '', vendor: '', open_ports: []},
-    last_online: new Date()
+    last_online: new Date(),
+    name: '',
+    type: '',
+    ip: '',
+    hostname: '',
+    mac: '',
+    vendor: '',
+    open_ports: []
 };
-const DEFAULT_SPOOFED_DEVICE: SpoofedDevice = {mac: '', ip: '', forward: false};
+
+const DEFAULT_SPOOFED_DEVICE: SpoofedDevice = {
+    mac: '',
+    ip: '',
+    forward: false
+};
 
 const useChangeEffect = (func: EffectCallback, deps: DependencyList) => {
     const didMount = useRef(false);
@@ -109,4 +121,4 @@ export {
     DEFAULT_DEVICE,
     DEFAULT_SPOOFED_DEVICE
 };
-export type {NetworkEntity, Device, SpoofedDevice};
+export type {PortInfo, Device, SpoofedDevice};

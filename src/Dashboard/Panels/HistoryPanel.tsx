@@ -4,7 +4,6 @@ import {TimePeriod, useInterval} from "../../Utils";
 import {ChartContainer, ChartTitle, DeviceCount, PeriodDropdown} from "../Components";
 import {fetchHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
-import {useNavigate} from "react-router-dom";
 
 function formatDate(interval: TimePeriod, date: Date) {
     return date.toLocaleString('en-GB', INTERVAL_TO_FORMAT.get(interval));
@@ -57,7 +56,6 @@ const PERIOD_TO_INTERVAL = new Map([
 ]);
 
 function HistoryPanel({onlineCount}: { onlineCount: Number }) {
-    const navigate = useNavigate();
     const [history, setHistory] = useState<{ time: Date, average: number }[]>([]);
     const [period, setPeriod] = useState<TimePeriod>(TimePeriod.Day);
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);

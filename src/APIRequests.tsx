@@ -23,7 +23,7 @@ function authHeader() {
 }
 
 async function fetchHistory(period: TimePeriod = TimePeriod.Day, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, average: number }[]> {
-    const response = await fetch(`${ORIGIN}/api/device/history?time_period=${period}&time_interval=${interval}`, {headers: authHeader()});
+    const response = await fetch(`${ORIGIN}/api/device/all/history?time_period=${period}&time_interval=${interval}`, {headers: authHeader()});
     const data = await response.json();
     return data.map((item: { time: string, average: number }) => ({
         time: new Date(item.time),
@@ -35,7 +35,7 @@ async function fetchDevices(): Promise<Device[]> {
     const response = await fetch(`${ORIGIN}/api/device/all`, {headers: authHeader()});
     const data = await response.json();
     return data.map((device: Device) => ({
-        entity: device.entity,
+        ...device,
         last_online: new Date(device.last_online),
     }));
 }
