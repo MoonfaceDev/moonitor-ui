@@ -2,13 +2,20 @@ import {
     DEFAULT_SPOOFED_DEVICE,
     Device,
     getLastSeenTime,
+    INTERVAL_TO_FORMAT,
     isOnline,
     SpoofedDevice,
+    TimePeriod,
     useChangeEffect,
+    useInterval,
     useMobile
 } from "../../Utils";
 import React, {ReactNode, useEffect, useState} from "react";
 import {Hover} from "../Components";
+import {Bar, BarChart, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis} from "recharts";
+import {fetchSingleHistory} from "../../APIRequests";
+import {POLL_INTERVAL} from "../../config";
+import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 
 function DetailsHeader({title, closePanel}: { title: string, closePanel: () => void }) {
     return (
@@ -68,6 +75,7 @@ function DialogBox({children, visible}: { children: ReactNode, visible: boolean 
             bottom: 0,
             right: 0,
             background: 'rgba(255,255,255,0.5)',
+            padding: 16
         }}>
             <div style={{
                 transition: 'transform 0.3s ease-out',
@@ -78,6 +86,7 @@ function DialogBox({children, visible}: { children: ReactNode, visible: boolean 
                 width: isMobile ? 360 : 500,
                 borderRadius: 16,
                 color: "white",
+                maxHeight: '100%',
             }}>
                 {children}
             </div>
@@ -204,6 +213,126 @@ function ActionsRow({device, spoofedDevice, setSpoofedDevice}: {
     );
 }
 
+const FORMAT_UNITS = new Map<TimePeriod, { value: TimePeriod, label: string }[]>([
+    [TimePeriod.Year, [{value: TimePeriod.Month, label: 'months'}, {value: TimePeriod.Day, label: 'days'}]],
+    [TimePeriod.Month, [{value: TimePeriod.Day, label: 'days'}, {value: TimePeriod.Hour, label: 'hr'}]],
+    [TimePeriod.Week, [{value: TimePeriod.Day, label: 'days'}, {value: TimePeriod.Hour, label: 'hr'}]],
+    [TimePeriod.Day, [{value: TimePeriod.Hour, label: 'hr'}, {value: TimePeriod.Minute, label: 'min'}]],
+    [TimePeriod.FourHours, [{value: TimePeriod.Hour, label: 'hr'}, {value: TimePeriod.Minute, label: 'min'}]],
+    [TimePeriod.Hour, [{value: TimePeriod.Minute, label: 'min'}]],
+]);
+
+function formatTimeInterval(scalePeriod: TimePeriod, timeInterval: number) {
+    if (!FORMAT_UNITS.has(scalePeriod)) {
+        throw Error('Unsupported time period');
+    }
+    const units = FORMAT_UNITS.get(scalePeriod);
+    let result = '';
+    units?.forEach(unit => {
+        if (timeInterval > unit.value) {
+            const unitSize = (timeInterval / unit.value) | 0;
+            result += `${unitSize}${unit.label}`;
+            timeInterval -= unitSize * unit.value;
+            if (timeInterval > unit.value) {
+                result += ', ';
+            }
+        }
+    })
+    if (result === '') {
+        return `0${units?.[units?.length - 1].label}`;
+    }
+    return result;
+}
+
+function formatDate(interval: TimePeriod, date: Date) {
+    return date.toLocaleString('en-GB', INTERVAL_TO_FORMAT.get(interval));
+}
+
+function formatData(interval: TimePeriod, data: { time: Date, onlineTime: number }[]) {
+    return data.map(item => ({
+        time: formatDate(interval, item.time),
+        onlineTime: item.onlineTime
+    }));
+}
+
+function SingleHistoryChart({interval, data}: { interval: TimePeriod, data: { time: Date, onlineTime: number }[] }) {
+    const formattedData = formatData(interval, data);
+
+    function CustomTooltip({payload, label}: TooltipProps<ValueType, NameType>) {
+        return (
+            payload && payload[0] && typeof (payload[0].value) === "number" ?
+                <div style={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8}}>
+                    <div>{label}</div>
+                    <div style={{color: '#b3e5fc'}}>online time: {formatTimeInterval(interval, payload[0].value)}</div>
+                </div>
+                : null
+        );
+    }
+
+    const yScale = FORMAT_UNITS.get(interval)![0].value;
+
+    return (
+        <ResponsiveContainer width='100%' height={200}>
+            <BarChart data={formattedData} margin={{top: 10, right: 60, left: 0, bottom: 0}}>
+                <defs>
+                    <linearGradient id='fillColor' x1='0' y1='0' x2='0' y2='1'>
+                        <stop offset='5%' stopColor='#00D1FF' stopOpacity={0.3}/>
+                        <stop offset='95%' stopColor='#00D1FF' stopOpacity={0}/>
+                    </linearGradient>
+                </defs>
+                <XAxis dataKey='time' fontSize={12}/>
+                <YAxis fontSize={12} tickFormatter={(y: number) => (y / yScale).toFixed(0)}/>
+                <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)'}}
+                         labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}} content={<CustomTooltip/>}/>
+                <Bar name='Online time' dataKey='onlineTime' stroke='#8884d8' fillOpacity={1}
+                     fill='url(#fillColor)'/>
+            </BarChart>
+        </ResponsiveContainer>
+    );
+}
+
+const PERIOD_TO_INTERVAL = new Map([
+    [TimePeriod.Year, TimePeriod.Month],
+    [TimePeriod.Month, TimePeriod.Day],
+    [TimePeriod.Week, TimePeriod.Day],
+    [TimePeriod.Day, TimePeriod.Hour],
+    [TimePeriod.FourHours, TimePeriod.TwentyMinutes],
+    [TimePeriod.Hour, TimePeriod.FiveMinutes],
+]);
+
+function SingleHistory({mac}: { mac: string }) {
+    const [history, setHistory] = useState<{ time: Date, onlineTime: number }[]>([]);
+    const [period, setPeriod] = useState<TimePeriod>(TimePeriod.Day);
+    const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
+
+    function setPeriodAndInterval(period: TimePeriod) {
+        setPeriod(period);
+        const interval = PERIOD_TO_INTERVAL.get(period);
+        if (interval) {
+            setInterval(interval);
+        }
+    }
+
+    useInterval(() => {
+        fetchSingleHistory(mac, period, interval)
+            .then(result => {
+                setHistory(result);
+            });
+    }, POLL_INTERVAL, [mac, period, interval]);
+    return (
+        <SingleHistoryChart interval={interval} data={history}/>
+    );
+}
+
+function Divider() {
+    return (
+        <hr style={{
+            flexGrow: 1,
+            margin: 16
+        }}/>
+    );
+}
+
 function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
     device: Device,
     spoofedDevice: SpoofedDevice,
@@ -213,13 +342,11 @@ function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
         <div style={{
             display: 'flex',
             flexDirection: 'column',
-            padding: 4
+            padding: 4,
+            overflowY: 'auto'
         }}>
             <OnlineRow device={device}/>
-            <hr style={{
-                flexGrow: 1,
-                margin: 16
-            }}/>
+            <Divider/>
             <ConditionalDetailRow label='IP Address' value={device.ip}/>
             <ConditionalDetailRow label='Hostname' value={device.hostname}/>
             <ConditionalDetailRow label='MAC Address' value={device.mac}/>
@@ -227,18 +354,20 @@ function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
             {
                 device.open_ports.length > 0 ?
                     <>
-                        <hr style={{
-                            flexGrow: 1,
-                            margin: 16
-                        }}/>
+                        <Divider/>
                         <OpenPortsDetail device={device}/>
                     </>
                     : null
             }
-            <hr style={{
-                flexGrow: 1,
-                margin: 16
-            }}/>
+            {
+                device.mac.length > 0 ?
+                    <>
+                        <Divider/>
+                        <SingleHistory mac={device.mac}/>
+                    </>
+                    : null
+            }
+            <Divider/>
             <ActionsRow device={device} spoofedDevice={spoofedDevice} setSpoofedDevice={setSpoofedDevice}/>
         </div>
     );

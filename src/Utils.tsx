@@ -15,7 +15,19 @@ enum TimePeriod {
     Hour = 60 * 60,
     TwentyMinutes = 20 * 60,
     FiveMinutes = 5 * 60,
+    Minute = 60,
 }
+
+const INTERVAL_TO_FORMAT = new Map<TimePeriod, Intl.DateTimeFormatOptions>([
+    [TimePeriod.Year, {year: 'numeric'}],
+    [TimePeriod.Month, {month: 'short', year: 'numeric'}],
+    [TimePeriod.Week, {day: 'numeric', month: 'short'}],
+    [TimePeriod.Day, {day: 'numeric', month: 'short'}],
+    [TimePeriod.FourHours, {hour: '2-digit', minute: '2-digit'}],
+    [TimePeriod.Hour, {hour: '2-digit', minute: '2-digit'}],
+    [TimePeriod.TwentyMinutes, {hour: '2-digit', minute: '2-digit'}],
+    [TimePeriod.FiveMinutes, {hour: '2-digit', minute: '2-digit'}],
+]);
 
 type PortInfo = {
     port: number,
@@ -115,6 +127,7 @@ export {
     useInterval,
     getTokenExpirationDelta,
     TimePeriod,
+    INTERVAL_TO_FORMAT,
     sortDevices,
     isOnline,
     getLastSeenTime,

@@ -1,6 +1,6 @@
 import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import React, {useState} from "react";
-import {TimePeriod, useInterval} from "../../Utils";
+import {INTERVAL_TO_FORMAT, TimePeriod, useInterval} from "../../Utils";
 import {ChartContainer, ChartTitle, DeviceCount, PeriodDropdown} from "../Components";
 import {fetchHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
@@ -12,17 +12,6 @@ function formatDate(interval: TimePeriod, date: Date) {
 function formatData(interval: TimePeriod, data: { time: Date, average: number }[]) {
     return data.map(item => ({time: formatDate(interval, item.time), average: item.average.toFixed(1)}))
 }
-
-const INTERVAL_TO_FORMAT = new Map<TimePeriod, Intl.DateTimeFormatOptions>([
-    [TimePeriod.Year, {year: 'numeric'}],
-    [TimePeriod.Month, {month: 'short', year: 'numeric'}],
-    [TimePeriod.Week, {day: 'numeric', month: 'short'}],
-    [TimePeriod.Day, {day: 'numeric', month: 'short'}],
-    [TimePeriod.FourHours, {hour: '2-digit', minute: '2-digit'}],
-    [TimePeriod.Hour, {hour: '2-digit', minute: '2-digit'}],
-    [TimePeriod.TwentyMinutes, {hour: '2-digit', minute: '2-digit'}],
-    [TimePeriod.FiveMinutes, {hour: '2-digit', minute: '2-digit'}],
-]);
 
 function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Date, average: number }[] }) {
     const formattedData = formatData(interval, data);
