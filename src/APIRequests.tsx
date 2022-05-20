@@ -22,12 +22,12 @@ function authHeader() {
     }
 }
 
-async function fetchSingleHistory(mac: string, period: TimePeriod = TimePeriod.Day, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, onlineTime: number }[]> {
-    const response = await fetch(`${ORIGIN}/api/device/mac/${mac}/history?time_period=${period}&time_interval=${interval}`, {headers: authHeader()});
+async function fetchUptimeHistory(mac: string, period: TimePeriod = TimePeriod.Day, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, uptime: number }[]> {
+    const response = await fetch(`${ORIGIN}/api/device/mac/${mac}/uptime?time_period=${period}&time_interval=${interval}`, {headers: authHeader()});
     const data = await response.json();
-    return data.map((item: { time: string, online_time: number }) => ({
+    return data.map((item: { time: string, uptime: number }) => ({
         time: new Date(item.time),
-        onlineTime: item.online_time,
+        uptime: item.uptime,
     }));
 }
 
@@ -113,7 +113,7 @@ async function fetchRegister(fullName: string, email: string, password: string) 
 }
 
 export {
-    fetchSingleHistory,
+    fetchUptimeHistory,
     fetchHistory,
     fetchDevices,
     fetchSpoofedDevice,

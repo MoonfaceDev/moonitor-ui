@@ -13,7 +13,7 @@ import {
 import React, {ReactNode, useEffect, useState} from "react";
 import {Hover} from "../Components";
 import {Bar, BarChart, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis} from "recharts";
-import {fetchSingleHistory} from "../../APIRequests";
+import {fetchUptimeHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 
@@ -248,14 +248,14 @@ function formatDate(interval: TimePeriod, date: Date) {
     return date.toLocaleString('en-GB', INTERVAL_TO_FORMAT.get(interval));
 }
 
-function formatData(interval: TimePeriod, data: { time: Date, onlineTime: number }[]) {
+function formatData(interval: TimePeriod, data: { time: Date, uptime: number }[]) {
     return data.map(item => ({
         time: formatDate(interval, item.time),
-        onlineTime: item.onlineTime
+        uptime: item.uptime
     }));
 }
 
-function SingleHistoryChart({interval, data}: { interval: TimePeriod, data: { time: Date, onlineTime: number }[] }) {
+function SingleHistoryChart({interval, data}: { interval: TimePeriod, data: { time: Date, uptime: number }[] }) {
     const formattedData = formatData(interval, data);
 
     function CustomTooltip({payload, label}: TooltipProps<ValueType, NameType>) {
@@ -263,7 +263,7 @@ function SingleHistoryChart({interval, data}: { interval: TimePeriod, data: { ti
             payload && payload[0] && typeof (payload[0].value) === "number" ?
                 <div style={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8}}>
                     <div>{label}</div>
-                    <div style={{color: '#b3e5fc'}}>online time: {formatTimeInterval(interval, payload[0].value)}</div>
+                    <div style={{color: '#b3e5fc'}}>uptime: {formatTimeInterval(interval, payload[0].value)}</div>
                 </div>
                 : null
         );
@@ -284,7 +284,7 @@ function SingleHistoryChart({interval, data}: { interval: TimePeriod, data: { ti
                 <YAxis fontSize={12} tickFormatter={(y: number) => (y / yScale).toFixed(0)}/>
                 <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)'}}
                          labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}} content={<CustomTooltip/>}/>
-                <Bar name='Online time' dataKey='onlineTime' stroke='#8884d8' fillOpacity={1}
+                <Bar name='Online time' dataKey='uptime' stroke='#8884d8' fillOpacity={1}
                      fill='url(#fillColor)'/>
             </BarChart>
         </ResponsiveContainer>
@@ -301,7 +301,7 @@ const PERIOD_TO_INTERVAL = new Map([
 ]);
 
 function SingleHistory({mac}: { mac: string }) {
-    const [history, setHistory] = useState<{ time: Date, onlineTime: number }[]>([]);
+    const [history, setHistory] = useState<{ time: Date, uptime: number }[]>([]);
     const [period, setPeriod] = useState<TimePeriod>(TimePeriod.Day);
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
 
@@ -314,7 +314,7 @@ function SingleHistory({mac}: { mac: string }) {
     }
 
     useInterval(() => {
-        fetchSingleHistory(mac, period, interval)
+        fetchUptimeHistory(mac, period, interval)
             .then(result => {
                 setHistory(result);
             });
