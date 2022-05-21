@@ -35,6 +35,15 @@ function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Da
     );
 }
 
+const PERIOD_OPTIONS = [
+    {label: 'Year', value: TimePeriod.Year},
+    {label: 'Month', value: TimePeriod.Month},
+    {label: 'Week', value: TimePeriod.Week},
+    {label: 'Day', value: TimePeriod.Day},
+    {label: '4 Hours', value: TimePeriod.FourHours},
+    {label: 'Hour', value: TimePeriod.Hour},
+]
+
 const PERIOD_TO_INTERVAL = new Map([
     [TimePeriod.Year, TimePeriod.Month],
     [TimePeriod.Month, TimePeriod.Day],
@@ -65,7 +74,10 @@ function HistoryPanel({onlineCount}: { onlineCount: Number }) {
     }, POLL_INTERVAL, [period, interval]);
     return (
         <ChartContainer>
-            <PeriodDropdown period={period} setPeriod={setPeriodAndInterval}/>
+            <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} style={{
+                position: 'absolute',
+                right: 32,
+            }}/>
             <ChartTitle>Connected Devices</ChartTitle>
             <DeviceCount onlineCount={onlineCount}/>
             <HistoryChart interval={interval} data={history}/>

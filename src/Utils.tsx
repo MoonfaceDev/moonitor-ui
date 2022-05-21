@@ -27,6 +27,7 @@ const INTERVAL_TO_FORMAT = new Map<TimePeriod, Intl.DateTimeFormatOptions>([
     [TimePeriod.Hour, {hour: '2-digit', minute: '2-digit'}],
     [TimePeriod.TwentyMinutes, {hour: '2-digit', minute: '2-digit'}],
     [TimePeriod.FiveMinutes, {hour: '2-digit', minute: '2-digit'}],
+    [TimePeriod.Minute, {hour: '2-digit', minute: '2-digit'}],
 ]);
 
 type PortInfo = {
