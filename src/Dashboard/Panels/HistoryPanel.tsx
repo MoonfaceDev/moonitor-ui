@@ -74,7 +74,7 @@ function HistoryPanel({onlineCount}: { onlineCount: Number }) {
     }, POLL_INTERVAL, [period, interval]);
     return (
         <ChartContainer>
-            <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} style={{
+            <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} containerStyle={{
                 position: 'absolute',
                 right: 32,
             }}/>

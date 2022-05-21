@@ -214,7 +214,6 @@ function ActionsRow({device, spoofedDevice, setSpoofedDevice}: {
 }
 
 const FORMAT_UNITS = new Map<TimePeriod, { value: TimePeriod, label: string }[]>([
-    [TimePeriod.Year, [{value: TimePeriod.Month, label: 'months'}, {value: TimePeriod.Day, label: 'days'}]],
     [TimePeriod.Month, [{value: TimePeriod.Day, label: 'days'}, {value: TimePeriod.Hour, label: 'hr'}]],
     [TimePeriod.Week, [{value: TimePeriod.Day, label: 'days'}, {value: TimePeriod.Hour, label: 'hr'}]],
     [TimePeriod.Day, [{value: TimePeriod.Hour, label: 'hr'}, {value: TimePeriod.Minute, label: 'min'}]],
@@ -223,7 +222,6 @@ const FORMAT_UNITS = new Map<TimePeriod, { value: TimePeriod, label: string }[]>
 ]);
 
 const PERIOD_OPTIONS = [
-    {label: 'Year', value: TimePeriod.Year},
     {label: 'Month', value: TimePeriod.Month},
     {label: 'Week', value: TimePeriod.Week},
     {label: 'Day', value: TimePeriod.Day},
@@ -327,16 +325,11 @@ function UptimeHistory({mac}: { mac: string }) {
             }}>Uptime</span>
             <div style={{
                 display: 'flex',
+                alignItems: 'center',
                 padding: '0 30px',
-                height: 50
+                height: 40
             }}>
-                <div style={{
-                    position: 'relative'
-                }}>
-                    <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} style={{
-                        position: 'absolute'
-                    }}/>
-                </div>
+                <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS}/>
             </div>
             <UptimeHistoryChart interval={interval} data={history}/>
         </div>

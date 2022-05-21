@@ -41,18 +41,24 @@ function Hover({children, style, disabled}: { children: ReactNode, style?: CSSPr
 type PeriodDropdownOption = { label: string, value: TimePeriod };
 
 
-function PeriodDropdown({period, setPeriod, options, style}: { period: TimePeriod, setPeriod: (period: TimePeriod) => void, options: PeriodDropdownOption[], style?: CSSProperties | undefined }) {
+function PeriodDropdown({period, setPeriod, options, containerStyle, controlStyle}: { period: TimePeriod, setPeriod: (period: TimePeriod) => void, options: PeriodDropdownOption[], containerStyle?: CSSProperties | undefined, controlStyle?: CSSProperties | undefined }) {
     const isMobile = useMobile();
     const styles: StylesConfig<PeriodDropdownOption, false> = {
-        container: () => ({
+        container: base => ({
+            ...base,
             width: isMobile ? 100 : 150,
-            ...style
+            ...containerStyle
         }),
+        control: base => ({
+            ...base,
+            ...controlStyle
+        })
     }
 
     return (
         <Select menuPlacement="auto"
                 menuPosition="fixed"
+                isSearchable={false}
                 onChange={(option: PeriodDropdownOption | null) => {
                     if (option) {
                         setPeriod(option.value);
