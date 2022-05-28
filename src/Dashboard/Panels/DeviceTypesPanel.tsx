@@ -1,5 +1,5 @@
 import {Device, useMobile} from "../../Utils";
-import {Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipProps} from "recharts";
+import {Cell, Label, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipProps} from "recharts";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 import React from "react";
 import {ChartContainer, ChartTitle} from "../Components";
@@ -51,7 +51,7 @@ function DeviceTypesChart({onlineDevices}: { onlineDevices: Device[] }) {
     function CustomTooltip({payload}: TooltipProps<ValueType, NameType>) {
         return (
             <div className="custom-tooltip"
-                 style={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8}}>
+                 style={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8, borderRadius: 8}}>
                 {payload && payload[0] && typeof (payload[0].value) === "number" ?
                     <label>{`${payload[0].name}: ${(payload[0].value / onlineDevices.length * 100).toFixed(0)}%`}</label>
                     : null}
@@ -65,20 +65,18 @@ function DeviceTypesChart({onlineDevices}: { onlineDevices: Device[] }) {
     return (
         <ResponsiveContainer width='100%' height='100%'>
             <PieChart margin={{top: 0, right: isMobile ? 20 : 144, left: 32, bottom: 0}}>
-                <Legend layout='vertical' verticalAlign='middle' align='left'/>
+                <Legend layout='vertical' verticalAlign='middle' align='left' iconType='circle' formatter={(value) => `${value} - ${formattedData.find(entry => entry.type === value)?.count}`}/>
                 <Pie data={formattedData}
                      dataKey="count"
                      nameKey="type"
-                     cx="50%"
-                     cy="50%"
+                     stroke='transparent'
                      innerRadius={isMobile ? 50 : 80}
                      outerRadius={isMobile ? 70 : 110}
-                     color="#000000"
-                     fill="#8884d8"
                      startAngle={90}
                      endAngle={-270}
-                     label
                      isAnimationActive={false}>
+                    <Label fill='#ffffff' value={onlineDevices.length} position="centerBottom" fontSize={20} style={{transform: 'translateY(-10px)'}}/>
+                    <Label fill='#ffffff' value='Devices' position="centerTop"/>
                     {cells}
                 </Pie>
                 <Tooltip animationDuration={100} content={<CustomTooltip/>}/>
