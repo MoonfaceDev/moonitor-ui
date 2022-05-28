@@ -277,7 +277,7 @@ function UptimeHistoryChart({interval, data}: { interval: TimePeriod, data: { ti
             return null;
         }
         return (
-            <div style={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8}}>
+            <div style={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8, borderRadius: 8}}>
                 <div>{label}</div>
                 <div style={{color: '#b3e5fc'}}>uptime: {formatUptime(interval, payload[0].value)}</div>
             </div>
@@ -294,8 +294,8 @@ function UptimeHistoryChart({interval, data}: { interval: TimePeriod, data: { ti
                     </linearGradient>
                 </defs>
                 <XAxis dataKey='time' fontSize={12} interval='preserveStart'/>
-                <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)'}}
-                         labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}} content={<CustomTooltip/>}/>
+                <Tooltip animationDuration={100} labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}}
+                         content={<CustomTooltip/>}/>
                 <Bar name='Uptime' dataKey='uptime' stroke='#8884d8' fillOpacity={1}
                      fill='url(#fillColor)'/>
             </BarChart>

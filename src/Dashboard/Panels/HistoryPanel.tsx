@@ -26,7 +26,7 @@ function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Da
                 </defs>
                 <XAxis dataKey='time' fontSize={12}/>
                 <YAxis fontSize={12}/>
-                <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)'}}
+                <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8, borderRadius: 8}}
                          labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}}/>
                 <Area type='monotone' name='average' dataKey='average' stroke='rgb(97, 218, 251)' strokeWidth={3} fillOpacity={1}
                       fill='url(#fillColor)'/>
