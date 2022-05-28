@@ -1,4 +1,4 @@
-import {TimePeriod, useMobile} from "../Utils";
+import {INTERVAL_TO_FORMAT, TimePeriod, useMobile} from "../Utils";
 import Select, {StylesConfig} from "react-select";
 import React, {CSSProperties, ReactNode, useState} from "react";
 
@@ -27,6 +27,7 @@ function Hover({children, style, disabled}: { children: ReactNode, style?: CSSPr
                      setButtonActive(false);
                      document.removeEventListener('mouseup', handleMouseUp);
                  }
+
                  setButtonActive(true);
                  document.addEventListener('mouseup', handleMouseUp);
              }}
@@ -80,6 +81,91 @@ function PeriodDropdown({period, setPeriod, options, containerStyle, controlStyl
     );
 }
 
+type SelectableTimePeriod =
+    | typeof TimePeriod.Year
+    | typeof TimePeriod.Month
+    | typeof TimePeriod.Week
+    | typeof TimePeriod.Day
+    | typeof TimePeriod.Hour;
+
+function getPeriodStartDatetime(timePeriod: SelectableTimePeriod) {
+    const now = new Date();
+    switch (timePeriod) {
+        case TimePeriod.Year:
+            return new Date(now.getFullYear(), 0, 1);
+        case TimePeriod.Month:
+            return new Date(now.getFullYear(), now.getMonth(), 1);
+        case TimePeriod.Week:
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            return new Date(today.setDate(today.getDate() - today.getDay()));
+        case TimePeriod.Day:
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        case TimePeriod.Hour:
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
+    }
+    return now;
+}
+
+function addPeriods(datetime: Date, count: number, timePeriod: SelectableTimePeriod) {
+    const datetimeClone = new Date(datetime.getTime());
+    switch (timePeriod) {
+        case TimePeriod.Year:
+            return new Date(datetimeClone.setFullYear(datetimeClone.getFullYear() + count));
+        case TimePeriod.Month:
+            return new Date(datetimeClone.setMonth(datetimeClone.getMonth() + count));
+        case TimePeriod.Week:
+            return new Date(datetimeClone.setDate(datetimeClone.getDate() + 7 * count));
+        case TimePeriod.Day:
+            return new Date(datetimeClone.setDate(datetimeClone.getDate() + count));
+        case TimePeriod.Hour:
+            return new Date(datetimeClone.setHours(datetimeClone.getHours() + count));
+    }
+    return datetime;
+}
+
+function getPeriodPreviousDatetime(datetime: Date, timePeriod: SelectableTimePeriod) {
+    return addPeriods(datetime, -1, timePeriod);
+}
+
+function getPeriodNextDatetime(datetime: Date, timePeriod: SelectableTimePeriod) {
+    return addPeriods(datetime, 1, timePeriod);
+}
+
+function formatDate(interval: TimePeriod, date: Date) {
+    return date.toLocaleString('en-GB', INTERVAL_TO_FORMAT.get(interval));
+}
+
+function PeriodSelector({period, startDatetime, setPrevious, setNext}: { period: SelectableTimePeriod, startDatetime: Date, setPrevious: () => void, setNext: () => void }) {
+    return (
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+        }}>
+            <Hover style={{borderRadius: '50%'}}>
+                        <span className='material-symbols-outlined'
+                              onClick={() => setPrevious()}
+                              style={{
+                                  userSelect: "none",
+                                  fontSize: 28,
+                                  padding: 4,
+                              }}>chevron_left</span>
+            </Hover>
+            <div style={{width: 100, textAlign: 'center'}}>
+                {formatDate(period, startDatetime)}
+            </div>
+            <Hover style={{borderRadius: '50%'}}>
+                        <span className='material-symbols-outlined'
+                              onClick={() => setNext()}
+                              style={{
+                                  userSelect: "none",
+                                  fontSize: 28,
+                                  padding: 4,
+                              }}>chevron_right</span>
+            </Hover>
+        </div>
+    );
+}
+
 function ChartContainer({children}: { children: ReactNode }) {
     return (
         <div style={{
@@ -130,4 +216,5 @@ function DeviceCount({onlineCount}: { onlineCount: Number }) {
     );
 }
 
-export {Hover, PeriodDropdown, ChartContainer, ChartTitle, DeviceCount};
+export {Hover, PeriodDropdown, ChartContainer, getPeriodStartDatetime, getPeriodPreviousDatetime, getPeriodNextDatetime, PeriodSelector, ChartTitle, DeviceCount};
+export type { SelectableTimePeriod };

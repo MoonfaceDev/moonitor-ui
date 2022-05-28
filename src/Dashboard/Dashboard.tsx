@@ -32,9 +32,6 @@ function Dashboard() {
         fetchDevices()
             .then(result => {
                 setDevices(result);
-            })
-            .catch(reason => {
-                console.error(reason);
             });
     }, POLL_INTERVAL, []);
     useTimeout(() => {

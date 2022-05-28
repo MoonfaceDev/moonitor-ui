@@ -7,15 +7,23 @@ import {
     SpoofedDevice,
     TimePeriod,
     useChangeEffect,
-    useInterval,
     useMobile
 } from "../../Utils";
 import React, {ReactNode, useEffect, useState} from "react";
-import {Hover, PeriodDropdown} from "../Components";
+import {
+    getPeriodNextDatetime,
+    getPeriodPreviousDatetime,
+    getPeriodStartDatetime,
+    Hover,
+    PeriodDropdown,
+    PeriodSelector,
+    SelectableTimePeriod
+} from "../Components";
 import {Bar, BarChart, ResponsiveContainer, Tooltip, TooltipProps, XAxis} from "recharts";
 import {fetchUptimeHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
+import Loading from "../../Loading/Loading";
 
 function DetailsHeader({title, closePanel}: { title: string, closePanel: () => void }) {
     return (
@@ -285,7 +293,7 @@ function UptimeHistoryChart({interval, data}: { interval: TimePeriod, data: { ti
                         <stop offset='95%' stopColor='#00D1FF' stopOpacity={0}/>
                     </linearGradient>
                 </defs>
-                <XAxis dataKey='time' fontSize={12}/>
+                <XAxis dataKey='time' fontSize={12} interval='preserveStart'/>
                 <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)'}}
                          labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}} content={<CustomTooltip/>}/>
                 <Bar name='Uptime' dataKey='uptime' stroke='#8884d8' fillOpacity={1}
@@ -296,9 +304,26 @@ function UptimeHistoryChart({interval, data}: { interval: TimePeriod, data: { ti
 }
 
 function UptimeHistory({mac}: { mac: string }) {
+    const [loading, setLoading] = useState<boolean>(false);
     const [history, setHistory] = useState<{ time: Date, uptime: number }[]>([]);
-    const [period, setPeriod] = useState<TimePeriod>(TimePeriod.Day);
+    const [period, setPeriod] = useState<SelectableTimePeriod>(TimePeriod.Day);
+    const [startDatetime, setStartDatetime] = useState<Date>(new Date());
+    const [endDatetime, setEndDatetime] = useState<Date>(new Date());
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
+
+    function setPrevious() {
+        setStartDatetime(getPeriodPreviousDatetime(startDatetime, period));
+        setEndDatetime(getPeriodPreviousDatetime(endDatetime, period));
+    }
+
+    function setNext() {
+        setStartDatetime(getPeriodNextDatetime(startDatetime, period));
+        setEndDatetime(getPeriodNextDatetime(endDatetime, period));
+    }
+
+    useEffect(() => {
+        setPeriodAndInterval(TimePeriod.Day);
+    }, [mac]);
 
     function setPeriodAndInterval(period: TimePeriod) {
         setPeriod(period);
@@ -306,33 +331,54 @@ function UptimeHistory({mac}: { mac: string }) {
         if (units && units[0]) {
             setInterval(units[0].value);
         }
+        const newStartDatetime = getPeriodStartDatetime(period);
+        setStartDatetime(newStartDatetime);
+        setEndDatetime(getPeriodNextDatetime(newStartDatetime, period));
     }
 
-    useInterval(() => {
-        fetchUptimeHistory(mac, period, interval)
+    const updateUptimeHistory = (blocking: boolean) => {
+        if (blocking) {
+            setLoading(true);
+        }
+        fetchUptimeHistory(mac, startDatetime, endDatetime, interval)
             .then(result => {
                 setHistory(result);
+                setLoading(false);
             });
-    }, POLL_INTERVAL, [mac, period, interval]);
+    }
+
+    useChangeEffect(() => {
+        updateUptimeHistory(true);
+        const intervalID = window.setTimeout(() => {
+            updateUptimeHistory(false);
+        }, POLL_INTERVAL);
+        return () => window.clearTimeout(intervalID);
+    }, [mac, startDatetime, endDatetime, interval]);
     return (
-        <div style={{
-            display: "flex",
-            flexDirection: "column",
-        }}>
+        <>
+            <Loading visible={loading}/>
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+            }}>
             <span style={{
                 margin: '0 16px',
                 textAlign: "center",
             }}>Uptime</span>
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0 30px',
-                height: 40
-            }}>
-                <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS}/>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0 30px',
+                }}>
+                    <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS}/>
+                    <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
+                        <PeriodSelector period={period} startDatetime={startDatetime} setPrevious={setPrevious}
+                                        setNext={setNext}/>
+                    </div>
+                </div>
+                <UptimeHistoryChart interval={interval} data={history}/>
             </div>
-            <UptimeHistoryChart interval={interval} data={history}/>
-        </div>
+        </>
     );
 }
 

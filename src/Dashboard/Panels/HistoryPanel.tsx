@@ -28,7 +28,7 @@ function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Da
                 <YAxis fontSize={12}/>
                 <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)'}}
                          labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}}/>
-                <Area type='monotone' name='average' dataKey='average' stroke='#8884d8' fillOpacity={1}
+                <Area type='monotone' name='average' dataKey='average' stroke='#8884d8' strokeWidth={10} fillOpacity={1}
                       fill='url(#fillColor)'/>
             </AreaChart>
         </ResponsiveContainer>

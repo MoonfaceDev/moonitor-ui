@@ -22,8 +22,8 @@ function authHeader() {
     }
 }
 
-async function fetchUptimeHistory(mac: string, period: TimePeriod = TimePeriod.Day, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, uptime: number }[]> {
-    const response = await fetch(`${ORIGIN}/api/device/mac/${mac}/uptime?time_period=${period}&time_interval=${interval}`, {headers: authHeader()});
+async function fetchUptimeHistory(mac: string, startDatetime: Date, endDatetime: Date, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, uptime: number }[]> {
+    const response = await fetch(`${ORIGIN}/api/device/mac/${mac}/uptime?start_timestamp=${startDatetime.getTime()/1000}&end_timestamp=${endDatetime.getTime()/1000}&time_interval=${interval}`, {headers: authHeader()});
     const data = await response.json();
     return data.map((item: { time: string, uptime: number }) => ({
         time: new Date(item.time),
