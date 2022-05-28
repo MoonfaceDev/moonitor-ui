@@ -20,7 +20,7 @@ function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Da
             <AreaChart data={formattedData} margin={{top: 10, right: 60, left: 0, bottom: 0}}>
                 <defs>
                     <linearGradient id='fillColor' x1='0' y1='0' x2='0' y2='1'>
-                        <stop offset='5%' stopColor='#00D1FF' stopOpacity={0.3}/>
+                        <stop offset='5%' stopColor='#00D1FF' stopOpacity={0.15}/>
                         <stop offset='95%' stopColor='#00D1FF' stopOpacity={0}/>
                     </linearGradient>
                 </defs>
@@ -28,7 +28,7 @@ function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Da
                 <YAxis fontSize={12}/>
                 <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)'}}
                          labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}}/>
-                <Area type='monotone' name='average' dataKey='average' stroke='#8884d8' strokeWidth={10} fillOpacity={1}
+                <Area type='monotone' name='average' dataKey='average' stroke='rgb(97, 218, 251)' strokeWidth={3} fillOpacity={1}
                       fill='url(#fillColor)'/>
             </AreaChart>
         </ResponsiveContainer>
