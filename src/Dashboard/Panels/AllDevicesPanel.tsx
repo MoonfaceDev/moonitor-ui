@@ -12,7 +12,7 @@ import {
 } from "../../Utils";
 import DeviceDetailsPanel from "./DeviceDetailsPanel";
 import Loading from "../../Loading/Loading";
-import {TYPE_TO_ICON} from "../../config";
+import {TYPES} from "../../config";
 import {Hover} from "../Components";
 
 function DeviceView({device, spoofedDevice, openDetails}: {
@@ -47,7 +47,7 @@ function DeviceView({device, spoofedDevice, openDetails}: {
                         padding: 12,
                         fontSize: 40,
                     }}>
-                        {TYPE_TO_ICON.get(device.type)}
+                        {TYPES.get(device.type)?.icon}
                         {
                             online ?
                                 <div style={{

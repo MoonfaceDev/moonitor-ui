@@ -17,15 +17,15 @@ function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Da
     const formattedData = formatData(interval, data);
     return (
         <ResponsiveContainer width='100%' height='100%'>
-            <AreaChart data={formattedData} margin={{top: 10, right: 60, left: 0, bottom: 0}}>
+            <AreaChart data={formattedData} margin={{top: 10, right: 50, left: 0, bottom: 10}}>
                 <defs>
                     <linearGradient id='fillColor' x1='0' y1='0' x2='0' y2='1'>
                         <stop offset='5%' stopColor='#00D1FF' stopOpacity={0.15}/>
                         <stop offset='95%' stopColor='#00D1FF' stopOpacity={0}/>
                     </linearGradient>
                 </defs>
-                <XAxis dataKey='time' fontSize={12}/>
-                <YAxis fontSize={12}/>
+                <XAxis dataKey='time' fontSize={16} padding={{left: 10, right: 10}} tickMargin={10}/>
+                <YAxis fontSize={16} padding={{top: 10, bottom: 10}} tickMargin={10}/>
                 <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8, borderRadius: 8}}
                          labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}}/>
                 <Area type='monotone' name='average' dataKey='average' stroke='rgb(97, 218, 251)' strokeWidth={3} fillOpacity={1}
