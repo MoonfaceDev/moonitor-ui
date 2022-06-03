@@ -1,6 +1,6 @@
 const POLL_INTERVAL = 60 * 1000;
 
-const TYPES = new Map<string, {icon: string, color: string, hoverColor: string}>([
+const TYPES = new Map<string, { icon: string, color: string, hoverColor: string }>([
     ['Unknown', {icon: 'question_mark', color: '#B388FF', hoverColor: '#805acb'}],
     ['PC', {icon: 'desktop_windows', color: '#FFC107', hoverColor: '#c79100'}],
     ['Phone', {icon: 'phone_android', color: '#03A9F4', hoverColor: '#007ac1'}],

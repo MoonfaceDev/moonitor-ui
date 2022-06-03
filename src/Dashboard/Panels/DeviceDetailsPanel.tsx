@@ -9,7 +9,7 @@ import {
     useChangeEffect,
     useMobile
 } from "../../Utils";
-import React, {ReactNode, useEffect, useState} from "react";
+import React, {CSSProperties, ReactNode, useEffect, useState} from "react";
 import {
     getPeriodNextDatetime,
     getPeriodPreviousDatetime,
@@ -24,6 +24,7 @@ import {fetchUptimeHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 import Loading from "../../Loading/Loading";
+import '../BulletList.css';
 
 function DetailsHeader({title, closePanel}: { title: string, closePanel: () => void }) {
     return (
@@ -123,13 +124,20 @@ function OnlineRow({device}: { device: Device }) {
 
 function DetailRow({label, value}: { label: string, value: string }) {
     return (
-        <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            margin: '4px 16px'
-        }}>
+        <div className="bullet-item"
+             style={{
+                 display: "flex",
+                 justifyContent: "space-between",
+             }}>
             <span>{label}</span>
-            <span>{value}</span>
+            <span style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flex: '1 0 0',
+                textAlign: 'end',
+                marginLeft: 10
+            }} title={value}>{value}</span>
         </div>
     );
 }
@@ -139,7 +147,34 @@ function ConditionalDetailRow({label, value}: { label: string, value: string }) 
         value
             ? <DetailRow label={label} value={value}/>
             : null
-    )
+    );
+}
+
+function TitleRow({title, icon, iconBackgroundColor, iconColor, style}: { title: string, icon: string, iconBackgroundColor: string, iconColor: string, style?: CSSProperties | undefined }) {
+    return (
+        <div style={{
+            marginLeft: 16,
+            fontSize: 20,
+            display: 'flex',
+            ...style
+        }}>
+            <div className='material-symbols-outlined' style={{
+                background: iconBackgroundColor,
+                borderRadius: 5,
+                color: iconColor,
+                marginRight: 10,
+                padding: 5
+            }}>
+                {icon}
+            </div>
+            <span style={{
+                display: 'flex',
+                alignItems: 'center',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+            }}>{title}</span>
+        </div>
+    );
 }
 
 function OpenPortsDetail({device}: { device: Device }) {
@@ -148,15 +183,15 @@ function OpenPortsDetail({device}: { device: Device }) {
             display: "flex",
             flexDirection: "column",
         }}>
-            <span style={{
-                margin: '0 16px',
-                textAlign: "center",
-            }}>Open Ports</span>
-            {
-                device.open_ports.map(open_port => {
-                    return <DetailRow key={open_port.port} label={open_port.port.toString()} value={open_port.service}/>
-                })
-            }
+            <TitleRow title="Open Ports" icon="list" iconBackgroundColor="#144C39" iconColor="#0FA470"/>
+            <ul className="bullet-list">
+                {
+                    device.open_ports.map(open_port => {
+                        return <DetailRow key={open_port.port} label={open_port.port.toString()}
+                                          value={open_port.service}/>
+                    })
+                }
+            </ul>
         </div>
     );
 }
@@ -266,7 +301,7 @@ function formatData(interval: TimePeriod, data: { time: Date, uptime: number }[]
     }));
 }
 
-function UptimeHistoryChart({interval, data}: { interval: TimePeriod, data: { time: Date, uptime: number }[] }) {
+function UptimeHistoryChart({interval, data, barClickCallback}: { interval: TimePeriod, data: { time: Date, uptime: number }[], barClickCallback: (value: Date) => void }) {
     const formattedData = formatData(interval, data);
 
     function CustomTooltip({payload, label}: TooltipProps<ValueType, NameType>) {
@@ -277,16 +312,29 @@ function UptimeHistoryChart({interval, data}: { interval: TimePeriod, data: { ti
             return null;
         }
         return (
-            <div style={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8, borderRadius: 8}}>
+            <div style={{
+                background: 'rgba(0, 0, 0, 0.7)',
+                border: '1px solid white',
+                color: 'white',
+                padding: 8,
+                borderRadius: 8
+            }}>
                 <div>{label}</div>
                 <div style={{color: '#b3e5fc'}}>uptime: {formatUptime(interval, payload[0].value)}</div>
             </div>
         );
     }
 
+    const onBarClick = (bar: any) => {
+        if (bar === null) {
+            return;
+        }
+        barClickCallback(data[bar.activeTooltipIndex].time);
+    }
+
     return (
         <ResponsiveContainer width='100%' height={100}>
-            <BarChart data={formattedData} margin={{top: 20, right: 30, left: 30, bottom: -10}}>
+            <BarChart data={formattedData} margin={{top: 20, right: 30, left: 30, bottom: -10}} onClick={onBarClick}>
                 <defs>
                     <linearGradient id='fillColor' x1='0' y1='0' x2='0' y2='1'>
                         <stop offset='5%' stopColor='#00D1FF' stopOpacity={0.3}/>
@@ -304,6 +352,7 @@ function UptimeHistoryChart({interval, data}: { interval: TimePeriod, data: { ti
 }
 
 function UptimeHistory({mac}: { mac: string }) {
+    const isMobile = useMobile();
     const [loading, setLoading] = useState<boolean>(false);
     const [history, setHistory] = useState<{ time: Date, uptime: number }[]>([]);
     const [period, setPeriod] = useState<SelectableTimePeriod>(TimePeriod.Day);
@@ -321,10 +370,6 @@ function UptimeHistory({mac}: { mac: string }) {
         setEndDatetime(getPeriodNextDatetime(endDatetime, period));
     }
 
-    useEffect(() => {
-        setPeriodAndInterval(TimePeriod.Day);
-    }, [mac]);
-
     function setPeriodAndInterval(period: TimePeriod) {
         setPeriod(period);
         const units = FORMAT_UNITS.get(period);
@@ -335,6 +380,10 @@ function UptimeHistory({mac}: { mac: string }) {
         setStartDatetime(newStartDatetime);
         setEndDatetime(getPeriodNextDatetime(newStartDatetime, period));
     }
+
+    useEffect(() => {
+        setPeriodAndInterval(TimePeriod.Day);
+    }, [mac]);
 
     const updateUptimeHistory = (blocking: boolean) => {
         if (blocking) {
@@ -354,6 +403,21 @@ function UptimeHistory({mac}: { mac: string }) {
         }, POLL_INTERVAL);
         return () => window.clearTimeout(intervalID);
     }, [mac, startDatetime, endDatetime, interval]);
+
+    const barClickCallback = (value: Date) => {
+        if (interval === TimePeriod.Minute) {
+            return;
+        }
+        const units = FORMAT_UNITS.get(period);
+        if (!units || !units[0]) {
+            return;
+        }
+        const newPeriod = units[0].value;
+        setPeriodAndInterval(newPeriod);
+        setStartDatetime(value);
+        setEndDatetime(getPeriodNextDatetime(value, newPeriod));
+    }
+
     return (
         <>
             <Loading visible={loading}/>
@@ -361,22 +425,22 @@ function UptimeHistory({mac}: { mac: string }) {
                 display: "flex",
                 flexDirection: "column",
             }}>
-            <span style={{
-                margin: '0 16px',
-                textAlign: "center",
-            }}>Uptime</span>
                 <div style={{
                     display: 'flex',
-                    alignItems: 'center',
-                    padding: '0 30px',
                 }}>
-                    <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS}/>
-                    <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
-                        <PeriodSelector period={period} startDatetime={startDatetime} setPrevious={setPrevious}
-                                        setNext={setNext}/>
+                    <TitleRow title="Uptime" icon="timeline" iconBackgroundColor="#464028" iconColor="#FFF383"
+                              style={{flex: 1}}/>
+                    <div style={{display: 'flex', paddingRight: 8}}>
+                        <PeriodDropdown containerStyle={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
+                                        setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} height={34}
+                                        arrowSize={18}/>
+                        <PeriodSelector style={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
+                                        startDatetime={startDatetime}
+                                        setPrevious={setPrevious}
+                                        setNext={setNext} height={32} iconFontSize={22}/>
                     </div>
                 </div>
-                <UptimeHistoryChart interval={interval} data={history}/>
+                <UptimeHistoryChart interval={interval} data={history} barClickCallback={barClickCallback}/>
             </div>
         </>
     );
@@ -401,18 +465,29 @@ function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
             display: 'flex',
             flexDirection: 'column',
             padding: 4,
-            overflowY: 'auto'
+            // @ts-ignore
+            overflowY: 'overlay',
+            overflowX: 'hidden',
+            '*::-webkit-scrollbar': {
+                width: '0.4em'
+            },
+            '*::-webkit-scrollbar-track': {
+                '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+            },
+            '*::-webkit-scrollbar-thumb': {
+                backgroundColor: 'rgba(0,0,0,.1)',
+                outline: '1px solid slategrey'
+            }
         }}>
             <OnlineRow device={device}/>
             <Divider/>
-            <span style={{
-                margin: '0 16px',
-                textAlign: "center",
-            }}>Network Details</span>
-            <ConditionalDetailRow label='IP Address' value={device.ip}/>
-            <ConditionalDetailRow label='Hostname' value={device.hostname}/>
-            <ConditionalDetailRow label='MAC Address' value={device.mac}/>
-            <ConditionalDetailRow label='MAC Vendor' value={device.vendor}/>
+            <TitleRow title="Network Details" icon="wifi" iconColor="#D32B61" iconBackgroundColor="#582936"/>
+            <ul className="bullet-list">
+                <ConditionalDetailRow label='IP Address' value={device.ip}/>
+                <ConditionalDetailRow label='Hostname' value={device.hostname}/>
+                <ConditionalDetailRow label='MAC Address' value={device.mac}/>
+                <ConditionalDetailRow label='MAC Vendor' value={device.vendor}/>
+            </ul>
             {
                 device.open_ports.length > 0 ?
                     <>

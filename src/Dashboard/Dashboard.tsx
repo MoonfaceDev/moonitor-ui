@@ -52,10 +52,10 @@ function Dashboard() {
             <div style={{
                 display: 'flex',
                 height: isMobile ? 600 : 400,
-                padding: 8,
                 flexDirection: isMobile ? 'column' : 'row',
+                padding: 4
             }}>
-                <HistoryPanel onlineCount={onlineDevices.length}/>
+                <HistoryPanel/>
                 <DeviceTypesPanel onlineDevices={onlineDevices}/>
             </div>
             <AllDevicesPanel devices={devices}/>

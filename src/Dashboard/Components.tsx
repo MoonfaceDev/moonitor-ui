@@ -1,6 +1,7 @@
 import {INTERVAL_TO_FORMAT, TimePeriod, useMobile} from "../Utils";
-import Select, {StylesConfig} from "react-select";
+import Select, {components, GroupBase, StylesConfig} from "react-select";
 import React, {CSSProperties, ReactNode, useState} from "react";
+import {DropdownIndicatorProps} from "react-select/dist/declarations/src/components/indicators";
 
 function Hover({children, style, disabled}: { children: ReactNode, style?: CSSProperties | undefined, disabled?: boolean }) {
     const [buttonHover, setButtonHover] = useState(false);
@@ -42,19 +43,50 @@ function Hover({children, style, disabled}: { children: ReactNode, style?: CSSPr
 type PeriodDropdownOption = { label: string, value: TimePeriod };
 
 
-function PeriodDropdown({period, setPeriod, options, containerStyle, controlStyle}: { period: TimePeriod, setPeriod: (period: TimePeriod) => void, options: PeriodDropdownOption[], containerStyle?: CSSProperties | undefined, controlStyle?: CSSProperties | undefined }) {
+function PeriodDropdown({period, setPeriod, options, containerStyle, controlStyle, height = 40, arrowSize = 20}: { period: TimePeriod, setPeriod: (period: TimePeriod) => void, options: PeriodDropdownOption[], containerStyle?: CSSProperties | undefined, controlStyle?: CSSProperties | undefined, height?: number | undefined, arrowSize?: number | undefined }) {
     const isMobile = useMobile();
     const styles: StylesConfig<PeriodDropdownOption, false> = {
         container: base => ({
             ...base,
-            width: isMobile ? 100 : 150,
+            width: isMobile ? 80 : 120,
+            height: height,
             ...containerStyle
         }),
         control: base => ({
             ...base,
-            ...controlStyle
+            borderRadius: 20,
+            border: 'solid 1px #0058cb',
+            minHeight: height,
+            height: height,
+            ...controlStyle,
+        }),
+        menu: base => ({
+            ...base,
+            background: '#000000'
+        }),
+        valueContainer: base => ({
+            ...base,
+            height: height,
         })
     }
+
+    const DropdownIndicator = (props: DropdownIndicatorProps<PeriodDropdownOption, false, GroupBase<PeriodDropdownOption>>) => {
+        return (
+            components.DropdownIndicator && (
+                <components.DropdownIndicator {...props}>
+                    <div className="material-symbols-outlined" style={{
+                        width: arrowSize,
+                        height: arrowSize,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        expand_more
+                    </div>
+                </components.DropdownIndicator>
+            )
+        );
+    };
 
     return (
         <Select menuPlacement="auto"
@@ -71,13 +103,24 @@ function PeriodDropdown({period, setPeriod, options, containerStyle, controlStyl
                     ...theme,
                     colors: {
                         ...theme.colors,
-                        neutral0: 'black',
-                        neutral80: 'white',
-                        primary25: '#003987',
-                        primary50: '#0058cb',
+                        neutral0: '#27293D',
+                        neutral5: '#2684ff',
+                        neutral10: '#2684ff',
+                        neutral20: '#2684ff',
+                        neutral30: '#2684ff',
+                        neutral40: '#2684ff',
+                        neutral50: '#2684ff',
+                        neutral60: '#2684ff',
+                        neutral70: '#2684ff',
+                        neutral80: '#2684ff',
+                        neutral90: '#2684ff',
+                        primary25: '#161616',
+                        primary50: '#2c2c2c',
+                        primary: '#2684ff',
                     }
                 })}
-                styles={styles}/>
+                styles={styles}
+                components={{IndicatorSeparator: null, DropdownIndicator}}/>
     );
 }
 
@@ -135,22 +178,28 @@ function formatDate(interval: TimePeriod, date: Date) {
     return date.toLocaleString('en-GB', INTERVAL_TO_FORMAT.get(interval));
 }
 
-function PeriodSelector({period, startDatetime, setPrevious, setNext}: { period: SelectableTimePeriod, startDatetime: Date, setPrevious: () => void, setNext: () => void }) {
+function PeriodSelector({period, startDatetime, setPrevious, setNext, style, height = 38, iconFontSize = 28}: { period: SelectableTimePeriod, startDatetime: Date, setPrevious: () => void, setNext: () => void, style?: CSSProperties | undefined, height?: number | undefined, iconFontSize?: number | undefined }) {
+    const isMobile = useMobile();
     return (
         <div style={{
             display: 'flex',
             alignItems: 'center',
+            border: 'solid 1px #676a8a',
+            borderRadius: 20,
+            height: height,
+            color: '#676a8a',
+            ...style
         }}>
             <Hover style={{borderRadius: '50%'}}>
                         <span className='material-symbols-outlined'
                               onClick={() => setPrevious()}
                               style={{
                                   userSelect: "none",
-                                  fontSize: 28,
+                                  fontSize: iconFontSize,
                                   padding: 4,
                               }}>chevron_left</span>
             </Hover>
-            <div style={{width: 100, textAlign: 'center'}}>
+            <div style={{width: isMobile ? 60 : 100, textAlign: 'center'}}>
                 {formatDate(period, startDatetime)}
             </div>
             <Hover style={{borderRadius: '50%'}}>
@@ -158,7 +207,7 @@ function PeriodSelector({period, startDatetime, setPrevious, setNext}: { period:
                               onClick={() => setNext()}
                               style={{
                                   userSelect: "none",
-                                  fontSize: 28,
+                                  fontSize: iconFontSize,
                                   padding: 4,
                               }}>chevron_right</span>
             </Hover>
@@ -167,17 +216,19 @@ function PeriodSelector({period, startDatetime, setPrevious, setNext}: { period:
 }
 
 function ChartContainer({children}: { children: ReactNode }) {
+    const isMobile = useMobile();
     return (
         <div style={{
-            position: "relative",
-            flex: '1',
+            position: 'relative',
+            flex: '1 0 0',
             minWidth: 0,
+            minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
             background: '#27293D',
             color: '#D3D1D8',
             borderRadius: 16,
-            margin: 8,
+            margin: isMobile ? 8 : '0 8px',
             padding: '16px 0',
         }}>
             {children}
@@ -185,36 +236,30 @@ function ChartContainer({children}: { children: ReactNode }) {
     )
 }
 
-function ChartTitle({children}: { children: ReactNode }) {
+function ChartTitle({children, style}: { children: ReactNode, style?: CSSProperties | undefined }) {
     const isMobile = useMobile();
     return (
         <span style={{
             fontSize: isMobile ? 20 : 24,
+            height: 40,
+            display: 'flex',
+            alignItems: 'center',
             padding: '0 0 0 32px',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            ...style
         }}>{children}</span>
     );
 }
 
-function DeviceCount({onlineCount}: { onlineCount: Number }) {
-    const isMobile = useMobile();
-    return (
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: isMobile ? 24 : 32,
-            padding: '0 0 16px 24px',
-            color: '#61dafb',
-        }}>
-                <span className='material-symbols-outlined' style={{
-                    fontSize: isMobile ? 24 : 32,
-                    margin: 8,
-                }}>computer</span>
-            <span style={{
-                margin: 8,
-            }}>{onlineCount.toString()}</span>
-        </div>
-    );
-}
-
-export {Hover, PeriodDropdown, ChartContainer, getPeriodStartDatetime, getPeriodPreviousDatetime, getPeriodNextDatetime, PeriodSelector, ChartTitle, DeviceCount};
-export type { SelectableTimePeriod };
+export {
+    Hover,
+    PeriodDropdown,
+    ChartContainer,
+    getPeriodStartDatetime,
+    getPeriodPreviousDatetime,
+    getPeriodNextDatetime,
+    PeriodSelector,
+    ChartTitle,
+};
+export type {SelectableTimePeriod};

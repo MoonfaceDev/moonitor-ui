@@ -20,7 +20,7 @@ enum TimePeriod {
 
 const INTERVAL_TO_FORMAT = new Map<TimePeriod, Intl.DateTimeFormatOptions>([
     [TimePeriod.Year, {year: 'numeric'}],
-    [TimePeriod.Month, {month: 'short', year: 'numeric'}],
+    [TimePeriod.Month, {month: 'short', year: '2-digit'}],
     [TimePeriod.Week, {day: 'numeric', month: 'short'}],
     [TimePeriod.Day, {day: 'numeric', month: 'short'}],
     [TimePeriod.FourHours, {hour: '2-digit', minute: '2-digit'}],

@@ -1,7 +1,16 @@
 import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
-import React, {useState} from "react";
-import {INTERVAL_TO_FORMAT, TimePeriod, useInterval} from "../../Utils";
-import {ChartContainer, ChartTitle, DeviceCount, PeriodDropdown} from "../Components";
+import React, {useEffect, useState} from "react";
+import {INTERVAL_TO_FORMAT, TimePeriod, useChangeEffect, useMobile} from "../../Utils";
+import {
+    ChartContainer,
+    ChartTitle,
+    getPeriodNextDatetime,
+    getPeriodPreviousDatetime,
+    getPeriodStartDatetime,
+    PeriodDropdown,
+    PeriodSelector,
+    SelectableTimePeriod,
+} from "../Components";
 import {fetchHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
 
@@ -24,11 +33,19 @@ function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Da
                         <stop offset='95%' stopColor='#00D1FF' stopOpacity={0}/>
                     </linearGradient>
                 </defs>
-                <XAxis dataKey='time' fontSize={16} padding={{left: 10, right: 10}} tickMargin={10}/>
+                <XAxis dataKey='time' fontSize={16} padding={{left: 20, right: 20}} tickMargin={10}
+                       interval='preserveStart'/>
                 <YAxis fontSize={16} padding={{top: 10, bottom: 10}} tickMargin={10}/>
-                <Tooltip animationDuration={100} contentStyle={{background: 'rgba(0, 0, 0, 0.7)', border: '1px solid white', color: 'white', padding: 8, borderRadius: 8}}
+                <Tooltip animationDuration={100} contentStyle={{
+                    background: 'rgba(0, 0, 0, 0.7)',
+                    border: '1px solid white',
+                    color: 'white',
+                    padding: 8,
+                    borderRadius: 8
+                }}
                          labelStyle={{color: 'white'}} itemStyle={{color: '#b3e5fc'}}/>
-                <Area type='monotone' name='average' dataKey='average' stroke='rgb(97, 218, 251)' strokeWidth={3} fillOpacity={1}
+                <Area type='monotone' name='average' dataKey='average' stroke='rgb(97, 218, 251)' strokeWidth={3}
+                      fillOpacity={1}
                       fill='url(#fillColor)'/>
             </AreaChart>
         </ResponsiveContainer>
@@ -36,11 +53,9 @@ function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Da
 }
 
 const PERIOD_OPTIONS = [
-    {label: 'Year', value: TimePeriod.Year},
     {label: 'Month', value: TimePeriod.Month},
     {label: 'Week', value: TimePeriod.Week},
     {label: 'Day', value: TimePeriod.Day},
-    {label: '4 Hours', value: TimePeriod.FourHours},
     {label: 'Hour', value: TimePeriod.Hour},
 ]
 
@@ -49,14 +64,26 @@ const PERIOD_TO_INTERVAL = new Map([
     [TimePeriod.Month, TimePeriod.Day],
     [TimePeriod.Week, TimePeriod.Day],
     [TimePeriod.Day, TimePeriod.Hour],
-    [TimePeriod.FourHours, TimePeriod.TwentyMinutes],
     [TimePeriod.Hour, TimePeriod.FiveMinutes],
 ]);
 
-function HistoryPanel({onlineCount}: { onlineCount: Number }) {
+function HistoryPanel() {
+    const isMobile = useMobile();
     const [history, setHistory] = useState<{ time: Date, average: number }[]>([]);
-    const [period, setPeriod] = useState<TimePeriod>(TimePeriod.Day);
+    const [period, setPeriod] = useState<SelectableTimePeriod>(TimePeriod.Day);
+    const [startDatetime, setStartDatetime] = useState<Date>(new Date());
+    const [endDatetime, setEndDatetime] = useState<Date>(new Date());
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
+
+    function setPrevious() {
+        setStartDatetime(getPeriodPreviousDatetime(startDatetime, period));
+        setEndDatetime(getPeriodPreviousDatetime(endDatetime, period));
+    }
+
+    function setNext() {
+        setStartDatetime(getPeriodNextDatetime(startDatetime, period));
+        setEndDatetime(getPeriodNextDatetime(endDatetime, period));
+    }
 
     function setPeriodAndInterval(period: TimePeriod) {
         setPeriod(period);
@@ -64,22 +91,45 @@ function HistoryPanel({onlineCount}: { onlineCount: Number }) {
         if (interval) {
             setInterval(interval);
         }
+        const newStartDatetime = getPeriodStartDatetime(period);
+        setStartDatetime(newStartDatetime);
+        setEndDatetime(getPeriodNextDatetime(newStartDatetime, period));
     }
 
-    useInterval(() => {
-        fetchHistory(period, interval)
+    const updateHistory = () => {
+        fetchHistory(startDatetime, endDatetime, interval)
             .then(result => {
                 setHistory(result);
             });
-    }, POLL_INTERVAL, [period, interval]);
+    }
+
+    useEffect(() => {
+        setPeriodAndInterval(TimePeriod.Day);
+    }, []);
+
+    useChangeEffect(() => {
+        updateHistory();
+        const intervalID = window.setTimeout(() => {
+            updateHistory();
+        }, POLL_INTERVAL);
+        return () => window.clearTimeout(intervalID);
+    }, [startDatetime, endDatetime, interval]);
+
     return (
         <ChartContainer>
-            <PeriodDropdown period={period} setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} containerStyle={{
-                position: 'absolute',
-                right: 32,
-            }}/>
-            <ChartTitle>Connected Devices</ChartTitle>
-            <DeviceCount onlineCount={onlineCount}/>
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+            }}>
+                <ChartTitle style={{flex: 1}}>Device History</ChartTitle>
+                <div style={{display: 'flex', justifyContent: 'flex-end', paddingRight: 8}}>
+                    <PeriodDropdown containerStyle={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
+                                    setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS}/>
+                    <PeriodSelector style={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
+                                    startDatetime={startDatetime} setPrevious={setPrevious}
+                                    setNext={setNext}/>
+                </div>
+            </div>
             <HistoryChart interval={interval} data={history}/>
         </ChartContainer>
     );

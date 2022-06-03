@@ -119,8 +119,7 @@ function AllDevicesPanel({devices}: { devices: Device[] }) {
                 gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr 1fr',
                 gridTemplateRows: 'auto',
                 position: "relative",
-                margin: 8,
-                padding: '16px 0',
+                margin: 4,
             }}>
                 {
                     sortedDevices.map(device => <DeviceView key={device.mac} device={device}
