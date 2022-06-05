@@ -2,7 +2,7 @@ import {Device, useMobile} from "../../Utils";
 import {Cell, Label, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipProps} from "recharts";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 import React, {useState} from "react";
-import {ChartContainer, ChartTitle} from "../Components";
+import {PanelContainer, ChartTitle} from "../Components";
 import {TYPES} from "../../config";
 
 function countEntitiesOfType(onlineDevices: Device[], type: string) {
@@ -102,10 +102,10 @@ function DeviceTypesChart({onlineDevices}: { onlineDevices: Device[] }) {
 
 function DeviceTypesPanel({onlineDevices}: { onlineDevices: Device[] }) {
     return (
-        <ChartContainer>
+        <PanelContainer style={{padding: '16px 0'}}>
             <ChartTitle>Device Types</ChartTitle>
             <DeviceTypesChart onlineDevices={onlineDevices}/>
-        </ChartContainer>
+        </PanelContainer>
     );
 }
 

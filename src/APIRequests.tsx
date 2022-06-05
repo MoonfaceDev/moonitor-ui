@@ -112,6 +112,50 @@ async function fetchRegister(fullName: string, email: string, password: string) 
     return await response.json();
 }
 
+async function fetchKnownDevicesCount() {
+    const response = await fetch(`${ORIGIN}/api/devices_config/count`, {headers: authHeader()});
+    const data = await response.json();
+    return data.count;
+}
+
+async function fetchViewDevicesConfig() {
+    const response = await fetch(`${ORIGIN}/api/devices_config/view`, {headers: authHeader()});
+    return await response.text();
+}
+
+async function fetchUpdateDevicesConfig(data: string) {
+    const response = await fetch(
+        `${ORIGIN}/api/devices_config/update`,
+        {method: 'post', headers: authHeader(), body: data}
+    );
+    return response.status;
+}
+
+async function fetchLastScanDatetime() {
+    const response = await fetch(`${ORIGIN}/api/scan_info/last_scan`, {headers: authHeader()});
+    const data = await response.json();
+    return new Date(data.last_scan);
+}
+
+async function fetchScanInterval() {
+    const response = await fetch(`${ORIGIN}/api/scan_info/interval`, {headers: authHeader()});
+    const data = await response.json();
+    return (data.interval * 1000);
+}
+
+async function fetchViewScanSettings() {
+    const response = await fetch(`${ORIGIN}/api/scan_info/view`, {headers: authHeader()});
+    return await response.text();
+}
+
+async function fetchUpdateScanSettings(data: string) {
+    const response = await fetch(
+        `${ORIGIN}/api/scan_info/update`,
+        {method: 'post', headers: authHeader(), body: data}
+    );
+    return response.status;
+}
+
 export {
     fetchUptimeHistory,
     fetchHistory,
@@ -121,5 +165,12 @@ export {
     fetchCheckToken,
     fetchLogin,
     fetchRegister,
+    fetchKnownDevicesCount,
+    fetchViewDevicesConfig,
+    fetchUpdateDevicesConfig,
+    fetchLastScanDatetime,
+    fetchScanInterval,
+    fetchViewScanSettings,
+    fetchUpdateScanSettings,
     APIError
 };

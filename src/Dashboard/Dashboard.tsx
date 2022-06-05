@@ -8,9 +8,12 @@ import {Device, getTokenExpirationDelta, isOnline, useInterval, useTimeout} from
 import {fetchDevices} from "../APIRequests";
 import {POLL_INTERVAL} from "../config";
 import {useNavigate} from "react-router-dom";
+import SearchPanel from "./Panels/SearchPanel";
+import KnownDevicesPanel from "./Panels/KnownDevicesPanel";
+import ScanSettingsPanel from "./Panels/ScanSettingsPanel";
 
 function Header() {
-    return <header style={{height: 100}}>
+    return <div style={{minHeight: 100}}>
         <img src={logo} alt='Moonitor' style={{
             position: 'absolute',
             height: 80,
@@ -20,12 +23,13 @@ function Header() {
             color: 'white',
             fontSize: 32,
         }}/>
-    </header>
+    </div>
 }
 
 function Dashboard() {
     const isMobile = useMediaQuery({query: `(max-width: 760px)`});
     const [devices, setDevices] = useState<Device[]>([]);
+    const [query, setQuery] = useState<string>('');
     const onlineDevices = devices.filter((device) => isOnline(device));
     const navigate = useNavigate();
     useInterval(() => {
@@ -40,6 +44,7 @@ function Dashboard() {
     }, getTokenExpirationDelta());
     return (
         <div style={{
+            position: 'relative',
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
@@ -47,18 +52,27 @@ function Dashboard() {
             background: '#1E1E26',
             fontFamily: 'Plus Jakarta Sans, sans-serif',
             padding: isMobile ? 0 : '0 300px',
+            overflow: 'overlay'
         }}>
             <Header/>
             <div style={{
                 display: 'flex',
                 height: isMobile ? 600 : 400,
                 flexDirection: isMobile ? 'column' : 'row',
-                padding: 4
             }}>
                 <HistoryPanel/>
                 <DeviceTypesPanel onlineDevices={onlineDevices}/>
             </div>
-            <AllDevicesPanel devices={devices}/>
+            <div style={{
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                minHeight: isMobile ? 240 : 96,
+            }}>
+                <SearchPanel query={query} setQuery={setQuery}/>
+                <KnownDevicesPanel totalDevices={devices.length}/>
+                <ScanSettingsPanel/>
+            </div>
+            <AllDevicesPanel devices={devices.filter(device => new RegExp(query, 'i').test(device.name))}/>
         </div>
     );
 }

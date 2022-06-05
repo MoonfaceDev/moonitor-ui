@@ -2,6 +2,7 @@ import {INTERVAL_TO_FORMAT, TimePeriod, useMobile} from "../Utils";
 import Select, {components, GroupBase, StylesConfig} from "react-select";
 import React, {CSSProperties, ReactNode, useState} from "react";
 import {DropdownIndicatorProps} from "react-select/dist/declarations/src/components/indicators";
+import {PolarAngleAxis, RadialBar, RadialBarChart} from "recharts";
 
 function Hover({children, style, disabled}: { children: ReactNode, style?: CSSProperties | undefined, disabled?: boolean }) {
     const [buttonHover, setButtonHover] = useState(false);
@@ -215,12 +216,11 @@ function PeriodSelector({period, startDatetime, setPrevious, setNext, style, hei
     );
 }
 
-function ChartContainer({children}: { children: ReactNode }) {
-    const isMobile = useMobile();
+function PanelContainer({children, style}: { children: ReactNode, style?: CSSProperties | undefined }) {
     return (
         <div style={{
             position: 'relative',
-            flex: '1 0 0',
+            flex: '1 0',
             minWidth: 0,
             minHeight: 0,
             display: 'flex',
@@ -228,8 +228,8 @@ function ChartContainer({children}: { children: ReactNode }) {
             background: '#27293D',
             color: '#D3D1D8',
             borderRadius: 16,
-            margin: isMobile ? 8 : '0 8px',
-            padding: '16px 0',
+            margin: 8,
+            ...style
         }}>
             {children}
         </div>
@@ -252,14 +252,57 @@ function ChartTitle({children, style}: { children: ReactNode, style?: CSSPropert
     );
 }
 
+function ProgressBar({value, maxValue}: { value: number, maxValue: number }) {
+    const chartData = [{value: value}];
+    return (
+        <RadialBarChart width={48}
+                        height={48}
+                        cx='50%'
+                        cy='50%'
+                        innerRadius={21}
+                        outerRadius={27}
+                        barSize={4}
+                        startAngle={90}
+                        endAngle={-270}
+                        data={chartData}
+        >
+            <PolarAngleAxis
+                type="number"
+                domain={[0, maxValue]}
+                angleAxisId={0}
+                tick={false}
+            />
+            <RadialBar
+                background={{fill: '#3c3f5e'}}
+                dataKey='value'
+                cornerRadius={24}
+                fill='rgb(97, 218, 251)'
+                isAnimationActive={false}
+            >
+            </RadialBar>
+            <text
+                x="50%"
+                y="50%"
+                fill="white"
+                fontSize={12}
+                textAnchor="middle"
+                dominantBaseline="middle"
+            >
+                {Math.min(value / maxValue * 100, 100).toFixed(0) + '%'}
+            </text>
+        </RadialBarChart>
+    )
+}
+
 export {
     Hover,
     PeriodDropdown,
-    ChartContainer,
+    PanelContainer,
     getPeriodStartDatetime,
     getPeriodPreviousDatetime,
     getPeriodNextDatetime,
     PeriodSelector,
     ChartTitle,
+    ProgressBar
 };
 export type {SelectableTimePeriod};

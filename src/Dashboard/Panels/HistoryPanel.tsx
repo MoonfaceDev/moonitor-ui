@@ -2,7 +2,7 @@ import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recha
 import React, {useEffect, useState} from "react";
 import {INTERVAL_TO_FORMAT, TimePeriod, useChangeEffect, useMobile} from "../../Utils";
 import {
-    ChartContainer,
+    PanelContainer,
     ChartTitle,
     getPeriodNextDatetime,
     getPeriodPreviousDatetime,
@@ -116,7 +116,7 @@ function HistoryPanel() {
     }, [startDatetime, endDatetime, interval]);
 
     return (
-        <ChartContainer>
+        <PanelContainer style={{padding: '16px 0'}}>
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -131,7 +131,7 @@ function HistoryPanel() {
                 </div>
             </div>
             <HistoryChart interval={interval} data={history}/>
-        </ChartContainer>
+        </PanelContainer>
     );
 }
 
