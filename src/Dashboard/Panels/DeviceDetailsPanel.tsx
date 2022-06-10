@@ -9,8 +9,9 @@ import {
     useChangeEffect,
     useMobile
 } from "../../Utils";
-import React, {CSSProperties, ReactNode, useEffect, useState} from "react";
+import React, {CSSProperties, useEffect, useState} from "react";
 import {
+    DialogBox, DialogHeader,
     getPeriodNextDatetime,
     getPeriodPreviousDatetime,
     getPeriodStartDatetime,
@@ -25,83 +26,6 @@ import {POLL_INTERVAL} from "../../config";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 import Loading from "../../Loading/Loading";
 import '../BulletList.css';
-
-function DetailsHeader({title, closePanel}: { title: string, closePanel: () => void }) {
-    return (
-        <div style={{
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-        }}>
-            <span style={{
-                position: 'absolute',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                padding: '8px 56px',
-                color: 'white',
-                fontSize: 20,
-                textAlign: 'center',
-                width: "100%",
-            }}>
-                        <b>{title}</b>
-                    </span>
-            <Hover style={{margin: 8, borderRadius: '50%', zIndex: 1}}>
-                        <span className='material-symbols-outlined'
-                              onClick={() => closePanel()}
-                              style={{
-                                  userSelect: "none",
-                                  fontSize: 32,
-                                  padding: 4,
-                              }}>close</span>
-            </Hover>
-        </div>
-    );
-}
-
-function DialogBox({children, visible}: { children: ReactNode, visible: boolean }) {
-    const isMobile = useMobile();
-    const [zIndex, setZIndex] = useState(-1);
-    useChangeEffect(() => {
-        if (visible) {
-            setZIndex(1);
-        } else {
-            setTimeout(() => {
-                setZIndex(-1);
-            }, 150);
-        }
-    }, [visible]);
-    return (
-        <div style={{
-            opacity: visible ? 1 : 0,
-            zIndex: zIndex,
-            display: 'flex',
-            transition: 'opacity 0.15s linear',
-            justifyContent: "center",
-            alignItems: "center",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-            background: 'rgba(255,255,255,0.5)',
-            padding: 16
-        }}>
-            <div style={{
-                transition: 'transform 0.3s ease-out',
-                transform: visible ? 'none' : 'translate(0, -50px)',
-                display: "flex",
-                flexDirection: "column",
-                background: '#27293D',
-                width: isMobile ? 360 : 500,
-                borderRadius: 16,
-                color: "white",
-                maxHeight: '100%',
-            }}>
-                {children}
-            </div>
-        </div>
-    );
-}
 
 function OnlineRow({device}: { device: Device }) {
     const online = isOnline(device);
@@ -532,7 +456,7 @@ function DeviceDetailsPanel({device, spoofedDevice, setSpoofedDevice, visible, c
     }, [visible]);
     return (
         <DialogBox visible={visible}>
-            <DetailsHeader title={device.name} closePanel={closePanel}/>
+            <DialogHeader title={device.name} onCancel={closePanel}/>
             <DetailsContent device={device} spoofedDevice={spoofedDevice} setSpoofedDevice={setSpoofedDevice}/>
         </DialogBox>
     );

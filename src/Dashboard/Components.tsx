@@ -1,4 +1,4 @@
-import {INTERVAL_TO_FORMAT, TimePeriod, useMobile} from "../Utils";
+import {INTERVAL_TO_FORMAT, TimePeriod, useChangeEffect, useMobile} from "../Utils";
 import Select, {components, GroupBase, StylesConfig} from "react-select";
 import React, {CSSProperties, ReactNode, useState} from "react";
 import {DropdownIndicatorProps} from "react-select/dist/declarations/src/components/indicators";
@@ -294,6 +294,104 @@ function ProgressBar({value, maxValue}: { value: number, maxValue: number }) {
     )
 }
 
+function DialogBox({children, visible}: { children: ReactNode, visible: boolean }) {
+    const isMobile = useMobile();
+    const [zIndex, setZIndex] = useState(-1);
+    useChangeEffect(() => {
+        if (visible) {
+            setZIndex(1);
+        } else {
+            setTimeout(() => {
+                setZIndex(-1);
+            }, 150);
+        }
+    }, [visible]);
+    return (
+        <div style={{
+            opacity: visible ? 1 : 0,
+            zIndex: zIndex,
+            display: 'flex',
+            transition: 'opacity 0.15s linear',
+            justifyContent: "center",
+            alignItems: "center",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            background: 'rgba(255,255,255,0.5)',
+            padding: 16
+        }}>
+            <div style={{
+                transition: 'transform 0.3s ease-out',
+                transform: visible ? 'none' : 'translate(0, -50px)',
+                display: "flex",
+                flexDirection: "column",
+                background: '#27293D',
+                width: isMobile ? 360 : 500,
+                borderRadius: 16,
+                color: "white",
+                maxHeight: '100%',
+            }}>
+                {children}
+            </div>
+        </div>
+    );
+}
+
+function DialogHeader({title, onCancel, onConfirm}: { title: string, onCancel?: () => void, onConfirm?: () => void }) {
+    return (
+        <div style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+        }}>
+            <span style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                padding: '8px 56px',
+                color: 'white',
+                fontSize: 20,
+                textAlign: 'center',
+                width: "100%",
+            }}>
+                        <b>{title}</b>
+                    </span>
+            {
+                onCancel === undefined ? null :
+                    <Hover style={{margin: 8, borderRadius: '50%', zIndex: 1}}>
+                        <span className='material-symbols-outlined'
+                              onClick={() => onCancel()}
+                              style={{
+                                  userSelect: "none",
+                                  fontSize: 32,
+                                  padding: 4,
+                              }}>close</span>
+                    </Hover>
+            }
+            <div style={{
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'flex-end'
+            }}>
+                {
+                    onConfirm === undefined ? null :
+                        <Hover style={{margin: 8, borderRadius: '50%', zIndex: 1}}>
+                        <span className='material-symbols-outlined'
+                              onClick={() => onConfirm()}
+                              style={{
+                                  userSelect: "none",
+                                  fontSize: 32,
+                                  padding: 4,
+                              }}>done</span>
+                        </Hover>
+                }
+            </div>
+        </div>
+    );
+}
+
 export {
     Hover,
     PeriodDropdown,
@@ -303,6 +401,8 @@ export {
     getPeriodNextDatetime,
     PeriodSelector,
     ChartTitle,
-    ProgressBar
+    ProgressBar,
+    DialogBox,
+    DialogHeader
 };
 export type {SelectableTimePeriod};

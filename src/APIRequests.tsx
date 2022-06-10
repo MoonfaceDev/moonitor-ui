@@ -126,9 +126,13 @@ async function fetchViewDevicesConfig() {
 async function fetchUpdateDevicesConfig(data: string) {
     const response = await fetch(
         `${ORIGIN}/api/devices_config/update`,
-        {method: 'post', headers: authHeader(), body: data}
+        {method: 'post', headers: [...authHeader(), ['Content-Type', 'application/json']], body: JSON.stringify({data: data})}
     );
-    return response.status;
+    if (response.status !== 200) {
+        const data = await response.text();
+        throw Error(data);
+    }
+    return;
 }
 
 async function fetchLastScanDatetime() {
@@ -153,7 +157,11 @@ async function fetchUpdateScanSettings(data: string) {
         `${ORIGIN}/api/scan_info/update`,
         {method: 'post', headers: authHeader(), body: data}
     );
-    return response.status;
+    if (response.status !== 200) {
+        const data = await response.text();
+        throw Error(data);
+    }
+    return;
 }
 
 export {

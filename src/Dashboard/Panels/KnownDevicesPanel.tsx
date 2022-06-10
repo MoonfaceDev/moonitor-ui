@@ -5,10 +5,12 @@ import {IconButton} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import {fetchKnownDevicesCount} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
+import KnownDevicesEditPanel from "./KnownDevicesEditPanel";
 
 function KnownDevicesPanel({totalDevices}: { totalDevices: number }) {
     const isMobile = useMobile();
     const [knownDevices, setKnownDevices] = useState<number>(0);
+    const [editPanelVisible, setEditPanelVisible] = useState(false);
     useInterval(() => {
         fetchKnownDevicesCount()
             .then(result => {
@@ -21,6 +23,7 @@ function KnownDevicesPanel({totalDevices}: { totalDevices: number }) {
                 display: 'flex',
                 padding: isMobile ? 8 : 16
             }}>
+                <KnownDevicesEditPanel visible={editPanelVisible} closePanel={() => setEditPanelVisible(false)}/>
                 <ProgressBar value={knownDevices} maxValue={totalDevices}/>
                 <div style={{
                     margin: '0 20px',
@@ -37,7 +40,7 @@ function KnownDevicesPanel({totalDevices}: { totalDevices: number }) {
                 </div>
                 <IconButton style={{
                     margin: 4
-                }}>
+                }} onClick={() => setEditPanelVisible(true)}>
                     <EditIcon/>
                 </IconButton>
             </div>
