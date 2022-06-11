@@ -1,6 +1,7 @@
 import React, {ReactNode, useState} from "react";
 import useMobile from "../../Common/Hooks/Mobile";
 import useChangeEffect from "../../Common/Hooks/ChangeEffect";
+import VisibleContext from "../../Common/Contexts/Visible";
 
 function DialogBox({children, visible}: { children: ReactNode, visible: boolean }) {
     const isMobile = useMobile();
@@ -41,7 +42,9 @@ function DialogBox({children, visible}: { children: ReactNode, visible: boolean 
                 color: "white",
                 maxHeight: '100%',
             }}>
-                {children}
+                <VisibleContext.Provider value={visible}>
+                    {children}
+                </VisibleContext.Provider>
             </div>
         </div>
     );

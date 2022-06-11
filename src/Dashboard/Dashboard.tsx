@@ -5,7 +5,7 @@ import HistoryPanel from "./Panels/HistoryPanel";
 import {useMediaQuery} from 'react-responsive';
 import AllDevicesPanel from "./Panels/AllDevicesPanel";
 import {fetchDevices} from "../APIRequests";
-import {POLL_INTERVAL} from "../config";
+import {getPollInterval} from "../config";
 import {useNavigate} from "react-router-dom";
 import SearchPanel from "./Panels/SearchPanel";
 import KnownDevicesPanel from "./Panels/KnownDevicesPanel";
@@ -40,7 +40,7 @@ function Dashboard() {
             .then(result => {
                 setDevices(result);
             });
-    }, POLL_INTERVAL, []);
+    }, getPollInterval(), []);
     useTimeout(() => {
         console.warn('Token expired');
         navigate('/login');

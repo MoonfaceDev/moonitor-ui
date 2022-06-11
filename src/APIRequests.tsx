@@ -149,20 +149,72 @@ async function fetchScanInterval() {
     return (data.interval * 1000);
 }
 
-async function fetchViewScanSettings() {
-    const response = await fetch(`${ORIGIN}/api/scan_info/view`, {headers: authHeader()});
-    return await response.text();
+type Settings = {
+    scanSettings: {
+        networkSubnet: string,
+        scanInterval: number,
+        portsToScan: number
+    },
+    serverSettings: {
+        tokenExpiryTime: number,
+        gatewayIp: string,
+        gatewayMac: string
+    }
 }
 
-async function fetchUpdateScanSettings(data: string) {
+async function fetchSettings(): Promise<Settings> {
+    const response = await fetch(`${ORIGIN}/api/settings/all`, {headers: authHeader()});
+    const data = await response.json();
+    return {
+        scanSettings: {
+            networkSubnet: data.scan_settings.network_subnet,
+            scanInterval: data.scan_settings.scan_interval,
+            portsToScan: data.scan_settings.ports_to_scan,
+        },
+        serverSettings: {
+            tokenExpiryTime: data.server_settings.token_expiry_time,
+            gatewayIp: data.server_settings.gateway_ip,
+            gatewayMac: data.server_settings.gateway_mac,
+        }
+    };
+}
+
+async function fetchUpdateSettings(settings: Settings) {
     const response = await fetch(
-        `${ORIGIN}/api/scan_info/update`,
-        {method: 'post', headers: authHeader(), body: data}
+        `${ORIGIN}/api/settings/update`,
+        {method: 'post', headers: [...authHeader(), ['Content-Type', 'application/json']], body: JSON.stringify({
+                scan_settings: {
+                    network_subnet: settings.scanSettings.networkSubnet,
+                    scan_interval: settings.scanSettings.scanInterval,
+                    ports_to_scan: settings.scanSettings.portsToScan,
+                },
+                server_settings: {
+                    token_expiry_time: settings.serverSettings.tokenExpiryTime,
+                    gateway_ip: settings.serverSettings.gatewayIp,
+                    gateway_mac: settings.serverSettings.gatewayMac,
+                }
+            })}
     );
     if (response.status !== 200) {
         const data = await response.text();
         throw Error(data);
     }
+    return;
+}
+
+async function fetchRestartScanService() {
+    await fetch(
+        `${ORIGIN}/api/settings/restart/scan`,
+        {method: 'post', headers: authHeader()}
+    );
+    return;
+}
+
+async function fetchRestartServerService() {
+    await fetch(
+        `${ORIGIN}/api/settings/restart/server`,
+        {method: 'post', headers: authHeader()}
+    );
     return;
 }
 
@@ -180,7 +232,9 @@ export {
     fetchUpdateDevicesConfig,
     fetchLastScanDatetime,
     fetchScanInterval,
-    fetchViewScanSettings,
-    fetchUpdateScanSettings,
+    fetchSettings,
+    fetchUpdateSettings,
+    fetchRestartScanService,
+    fetchRestartServerService,
     APIError
 };

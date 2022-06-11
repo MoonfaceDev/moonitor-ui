@@ -1,11 +1,9 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {IconButton} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import {fetchKnownDevicesCount} from "../../APIRequests";
-import {POLL_INTERVAL} from "../../config";
 import KnownDevicesEditPanel from "./KnownDevicesEditPanel";
 import useMobile from "../../Common/Hooks/Mobile";
-import useInterval from "../../Common/Hooks/Interval";
 import PanelContainer from "../../Components/Panel/PanelContainer";
 import ProgressBar from "../../Components/ProgressBar";
 
@@ -13,12 +11,12 @@ function KnownDevicesPanel({totalDevices}: { totalDevices: number }) {
     const isMobile = useMobile();
     const [knownDevices, setKnownDevices] = useState<number>(0);
     const [editPanelVisible, setEditPanelVisible] = useState(false);
-    useInterval(() => {
+    useEffect(() => {
         fetchKnownDevicesCount()
             .then(result => {
                 setKnownDevices(result);
             });
-    }, POLL_INTERVAL, []);
+    }, []);
     return (
         <PanelContainer>
             <div style={{
@@ -35,7 +33,8 @@ function KnownDevicesPanel({totalDevices}: { totalDevices: number }) {
                 }}>
                     <div style={{
                         fontSize: 20
-                    }}>Known Devices</div>
+                    }}>Known Devices
+                    </div>
                     <div style={{
                         color: '#c6c9ec'
                     }}>{knownDevices} out of {totalDevices}</div>

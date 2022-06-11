@@ -1,7 +1,7 @@
 import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import React, {useEffect, useState} from "react";
 import {fetchHistory} from "../../APIRequests";
-import {POLL_INTERVAL} from "../../config";
+import {getPollInterval} from "../../config";
 import {formatDate, TimePeriod} from "../../Common/TimePeriod";
 import useMobile from "../../Common/Hooks/Mobile";
 import useChangeEffect from "../../Common/Hooks/ChangeEffect";
@@ -95,10 +95,10 @@ function HistoryPanel() {
 
     useChangeEffect(() => {
         updateHistory();
-        const intervalID = window.setTimeout(() => {
+        const intervalID = window.setInterval(() => {
             updateHistory();
-        }, POLL_INTERVAL);
-        return () => window.clearTimeout(intervalID);
+        }, getPollInterval());
+        return () => window.clearInterval(intervalID);
     }, [startDatetime, endDatetime, interval]);
 
     return (

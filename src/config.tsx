@@ -1,4 +1,10 @@
-const POLL_INTERVAL = 60 * 1000;
+const getPollInterval = () => {
+    try {
+        return 1000 * parseInt(localStorage.getItem('syncDataInterval') || '60');
+    } catch (e) {
+        return 1000 * 60;
+    }
+}
 
 const TYPES = new Map<string, { icon: string, color: string, hoverColor: string }>([
     ['Unknown', {icon: 'question_mark', color: '#B388FF', hoverColor: '#805acb'}],
@@ -14,4 +20,4 @@ const TYPES = new Map<string, { icon: string, color: string, hoverColor: string 
     ['Security', {icon: 'lock', color: '#6a069c', hoverColor: '#37006d'}],
 ]);
 
-export {POLL_INTERVAL, TYPES};
+export {getPollInterval, TYPES};

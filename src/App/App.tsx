@@ -30,7 +30,7 @@ const theme = createTheme({
 function App() {
     return (
         <ThemeProvider theme={theme}>
-            <SnackbarProvider maxSnack={3} autoHideDuration={5000}>
+            <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
                 <Router>
                     <div className="app" style={{height: '100vh'}}>
                         <Routes>

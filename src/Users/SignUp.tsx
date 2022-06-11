@@ -1,7 +1,7 @@
 import React, {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import Loading from "../Components/Loading/Loading";
-import {BackButton, ErrorLabel, InputField, SpecialButton} from "../Components/AuthenticationComponents";
+import {BackButton, ErrorLabel, InputField, SpecialButton} from "./AuthenticationComponents";
 import {APIError, fetchRegister} from "../APIRequests";
 
 

@@ -1,7 +1,6 @@
-import React, {CSSProperties, useEffect, useState} from "react";
+import React, {CSSProperties, useContext, useEffect, useState} from "react";
 import {Bar, BarChart, ResponsiveContainer, Tooltip, TooltipProps, XAxis} from "recharts";
 import {fetchUptimeHistory} from "../../APIRequests";
-import {POLL_INTERVAL} from "../../config";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 import Loading from "../../Components/Loading/Loading";
 import '../BulletList.css';
@@ -9,7 +8,6 @@ import {Device, getLastSeenTime, isOnline} from "../../Common/Device";
 import {DEFAULT_SPOOFED_DEVICE, SpoofedDevice} from "../../Common/SpoofedDevice";
 import {formatDate, formatInterval, TimePeriod} from "../../Common/TimePeriod";
 import useMobile from "../../Common/Hooks/Mobile";
-import useChangeEffect from "../../Common/Hooks/ChangeEffect";
 import useEscape from "../../Common/Hooks/Escape";
 import Hover from "../../Components/Hover";
 import PeriodSelector, {
@@ -20,6 +18,9 @@ import PeriodSelector, {
 import PeriodDropdown from "../../Components/TimePeriod/PeriodDropdown";
 import DialogBox from "../../Components/Dialog/DialogBox";
 import DialogHeader from "../../Components/Dialog/DialogHeader";
+import VisibleContext from "../../Common/Contexts/Visible";
+import useDateState from "../../Common/Hooks/DateState";
+import useChangeEffect from "../../Common/Hooks/ChangeEffect";
 
 function OnlineRow({device}: { device: Device }) {
     const online = isOnline(device);
@@ -248,11 +249,12 @@ function UptimeHistoryChart({interval, data, barClickCallback}: { interval: Time
 
 function UptimeHistory({mac}: { mac: string }) {
     const isMobile = useMobile();
+    const visible = useContext(VisibleContext);
     const [loading, setLoading] = useState<boolean>(false);
     const [history, setHistory] = useState<{ time: Date, uptime: number }[]>([]);
     const [period, setPeriod] = useState<SelectableTimePeriod>(TimePeriod.Day);
-    const [startDatetime, setStartDatetime] = useState<Date>(new Date());
-    const [endDatetime, setEndDatetime] = useState<Date>(new Date());
+    const [startDatetime, setStartDatetime] = useDateState(new Date());
+    const [endDatetime, setEndDatetime] = useDateState(new Date());
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
 
     function setPeriodAndInterval(period: TimePeriod) {
@@ -270,10 +272,8 @@ function UptimeHistory({mac}: { mac: string }) {
         setPeriodAndInterval(TimePeriod.Day);
     }, [mac]);
 
-    const updateUptimeHistory = (blocking: boolean) => {
-        if (blocking) {
-            setLoading(true);
-        }
+    const updateUptimeHistory = () => {
+        setLoading(true);
         fetchUptimeHistory(mac, startDatetime, endDatetime, interval)
             .then(result => {
                 setHistory(result);
@@ -282,12 +282,11 @@ function UptimeHistory({mac}: { mac: string }) {
     }
 
     useChangeEffect(() => {
-        updateUptimeHistory(true);
-        const intervalID = window.setTimeout(() => {
-            updateUptimeHistory(false);
-        }, POLL_INTERVAL);
-        return () => window.clearTimeout(intervalID);
-    }, [mac, startDatetime, endDatetime, interval]);
+        if (!visible) {
+            return;
+        }
+        updateUptimeHistory();
+    }, [mac, startDatetime, endDatetime, interval, visible]);
 
     const barClickCallback = (value: Date) => {
         if (interval === TimePeriod.Minute) {
@@ -339,7 +338,7 @@ function Divider() {
 function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
     device: Device,
     spoofedDevice: SpoofedDevice,
-    setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void,
+    setSpoofedDevice: (spoofedDevice: SpoofedDevice) => void
 }) {
     return (
         <div style={{

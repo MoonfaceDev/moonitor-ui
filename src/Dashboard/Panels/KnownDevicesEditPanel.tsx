@@ -28,6 +28,11 @@ function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closeP
             .then(result => {
                 setData(result);
                 setLoading(false);
+            })
+            .catch(reason => {
+                enqueueSnackbar(reason.toString(), {variant: 'error'});
+                closePanel();
+                setLoading(false);
             });
     }, [visible]);
 
@@ -58,7 +63,7 @@ function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closeP
             })
             .catch(reason => {
                 setLoading(false);
-                enqueueSnackbar(reason, {variant: 'error'});
+                enqueueSnackbar(reason.toString(), {variant: 'error'});
             });
     }, [valid, obscured, errors, data]);
 

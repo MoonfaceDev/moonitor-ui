@@ -2,23 +2,25 @@ import React, {useEffect, useState} from "react";
 import {IconButton} from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import {fetchLastScanDatetime, fetchScanInterval} from "../../APIRequests";
-import {POLL_INTERVAL} from "../../config";
+import {getPollInterval} from "../../config";
 import useMobile from "../../Common/Hooks/Mobile";
 import useInterval from "../../Common/Hooks/Interval";
 import ProgressBar from "../../Components/ProgressBar";
 import PanelContainer from "../../Components/Panel/PanelContainer";
+import SettingsEditPanel from "./SettingsEditPanel";
 
 function ScanSettingsPanel() {
     const isMobile = useMobile();
     const [lastScan, setLastScan] = useState<Date>(new Date());
     const [scanInterval, setScanInterval] = useState<number>(0);
     const [now, setNow] = useState<Date>(new Date());
+    const [editPanelVisible, setEditPanelVisible] = useState(false);
     useInterval(() => {
         fetchLastScanDatetime()
             .then(result => {
                 setLastScan(result);
             });
-    }, POLL_INTERVAL, []);
+    }, getPollInterval(), []);
     useEffect(() => {
         fetchScanInterval()
             .then(result => {
@@ -36,6 +38,7 @@ function ScanSettingsPanel() {
                 display: 'flex',
                 padding: isMobile ? 8 : 16
             }}>
+                <SettingsEditPanel visible={editPanelVisible} closePanel={() => setEditPanelVisible(false)}/>
                 <ProgressBar value={timeSinceLastScan} maxValue={scanInterval}/>
                 <div style={{
                     margin: '0 20px',
@@ -62,7 +65,7 @@ function ScanSettingsPanel() {
                 </div>
                 <IconButton style={{
                     margin: 4
-                }}>
+                }} onClick={() => setEditPanelVisible(true)}>
                     <SettingsIcon/>
                 </IconButton>
             </div>
