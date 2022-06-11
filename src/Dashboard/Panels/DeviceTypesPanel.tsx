@@ -5,7 +5,7 @@ import {TYPES} from "../../config";
 import {Device} from "../../Common/Device";
 import useMobile from "../../Common/Hooks/Mobile";
 import PanelContainer from "../../Components/Panel/PanelContainer";
-import ChartTitle from "../../Components/Panel/ChartTitle";
+import PanelTitle from "../../Components/Panel/PanelTitle";
 
 function countEntitiesOfType(onlineDevices: Device[], type: string) {
     let count = 0;
@@ -105,7 +105,7 @@ function DeviceTypesChart({onlineDevices}: { onlineDevices: Device[] }) {
 function DeviceTypesPanel({onlineDevices}: { onlineDevices: Device[] }) {
     return (
         <PanelContainer style={{padding: '16px 0'}}>
-            <ChartTitle>Device Types</ChartTitle>
+            <PanelTitle>Device Types</PanelTitle>
             <DeviceTypesChart onlineDevices={onlineDevices}/>
         </PanelContainer>
     );

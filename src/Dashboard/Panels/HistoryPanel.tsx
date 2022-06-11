@@ -11,7 +11,7 @@ import PeriodSelector, {
     SelectableTimePeriod
 } from "../../Components/TimePeriod/PeriodSelector";
 import PanelContainer from "../../Components/Panel/PanelContainer";
-import ChartTitle from "../../Components/Panel/ChartTitle";
+import PanelTitle from "../../Components/Panel/PanelTitle";
 import PeriodDropdown from "../../Components/TimePeriod/PeriodDropdown";
 
 function formatData(interval: TimePeriod, data: { time: Date, average: number }[]) {
@@ -117,7 +117,7 @@ function HistoryPanel() {
                 display: 'flex',
                 alignItems: 'center',
             }}>
-                <ChartTitle style={{flex: 1}}>Device History</ChartTitle>
+                <PanelTitle style={{flex: 1}}>Device History</PanelTitle>
                 <div style={{display: 'flex', justifyContent: 'flex-end', paddingRight: 8}}>
                     <PeriodDropdown containerStyle={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
                                     setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS}/>

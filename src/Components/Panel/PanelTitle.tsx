@@ -1,7 +1,7 @@
 import React, {CSSProperties, ReactNode} from "react";
 import useMobile from "../../Common/Hooks/Mobile";
 
-function ChartTitle({children, style}: { children: ReactNode, style?: CSSProperties | undefined }) {
+function PanelTitle({children, style}: { children: ReactNode, style?: CSSProperties | undefined }) {
     const isMobile = useMobile();
     return (
         <span style={{
@@ -17,4 +17,4 @@ function ChartTitle({children, style}: { children: ReactNode, style?: CSSPropert
     );
 }
 
-export default ChartTitle;
+export default PanelTitle;
