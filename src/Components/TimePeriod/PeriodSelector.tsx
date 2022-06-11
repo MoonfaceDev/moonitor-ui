@@ -1,5 +1,5 @@
 import {formatDate, TimePeriod} from "../../Common/TimePeriod";
-import React, {CSSProperties} from "react";
+import React, {CSSProperties, useCallback} from "react";
 import useMobile from "../../Common/Hooks/Mobile";
 import Hover from "../Hover";
 
@@ -53,8 +53,19 @@ function getPeriodNextDatetime(datetime: Date, timePeriod: SelectableTimePeriod)
     return addPeriods(datetime, 1, timePeriod);
 }
 
-function PeriodSelector({period, startDatetime, setPrevious, setNext, style, height = 38, iconFontSize = 28}: { period: SelectableTimePeriod, startDatetime: Date, setPrevious: () => void, setNext: () => void, style?: CSSProperties | undefined, height?: number | undefined, iconFontSize?: number | undefined }) {
+function PeriodSelector({period, startDatetime, setStartDatetime, endDatetime, setEndDatetime, style, height = 38, iconFontSize = 28}: { period: SelectableTimePeriod, startDatetime: Date, setStartDatetime: (value: Date) => void, endDatetime: Date, setEndDatetime: (value: Date) => void, style?: CSSProperties | undefined, height?: number | undefined, iconFontSize?: number | undefined }) {
     const isMobile = useMobile();
+
+    const setPrevious = useCallback(() => {
+        setStartDatetime(getPeriodPreviousDatetime(startDatetime, period));
+        setEndDatetime(getPeriodPreviousDatetime(endDatetime, period));
+    }, [startDatetime, endDatetime, period]);
+
+    const setNext = useCallback(() => {
+        setStartDatetime(getPeriodNextDatetime(startDatetime, period));
+        setEndDatetime(getPeriodNextDatetime(endDatetime, period));
+    }, [startDatetime, endDatetime, period]);
+
     return (
         <div style={{
             display: 'flex',

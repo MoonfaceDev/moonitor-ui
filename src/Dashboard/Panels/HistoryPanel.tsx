@@ -7,7 +7,7 @@ import useMobile from "../../Common/Hooks/Mobile";
 import useChangeEffect from "../../Common/Hooks/ChangeEffect";
 import PeriodSelector, {
     getPeriodNextDatetime,
-    getPeriodPreviousDatetime, getPeriodStartDatetime,
+    getPeriodStartDatetime,
     SelectableTimePeriod
 } from "../../Components/TimePeriod/PeriodSelector";
 import PanelContainer from "../../Components/Panel/PanelContainer";
@@ -71,16 +71,6 @@ function HistoryPanel() {
     const [endDatetime, setEndDatetime] = useState<Date>(new Date());
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
 
-    function setPrevious() {
-        setStartDatetime(getPeriodPreviousDatetime(startDatetime, period));
-        setEndDatetime(getPeriodPreviousDatetime(endDatetime, period));
-    }
-
-    function setNext() {
-        setStartDatetime(getPeriodNextDatetime(startDatetime, period));
-        setEndDatetime(getPeriodNextDatetime(endDatetime, period));
-    }
-
     function setPeriodAndInterval(period: TimePeriod) {
         setPeriod(period);
         const interval = PERIOD_TO_INTERVAL.get(period);
@@ -122,8 +112,8 @@ function HistoryPanel() {
                     <PeriodDropdown containerStyle={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
                                     setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS}/>
                     <PeriodSelector style={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
-                                    startDatetime={startDatetime} setPrevious={setPrevious}
-                                    setNext={setNext}/>
+                                    startDatetime={startDatetime} setStartDatetime={setStartDatetime}
+                                    endDatetime={endDatetime} setEndDatetime={setEndDatetime}/>
                 </div>
             </div>
             <HistoryChart interval={interval} data={history}/>

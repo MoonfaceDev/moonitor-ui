@@ -7,14 +7,14 @@ import Loading from "../../Components/Loading/Loading";
 import '../BulletList.css';
 import {Device, getLastSeenTime, isOnline} from "../../Common/Device";
 import {DEFAULT_SPOOFED_DEVICE, SpoofedDevice} from "../../Common/SpoofedDevice";
-import {formatDate, TimePeriod} from "../../Common/TimePeriod";
+import {formatDate, formatInterval, TimePeriod} from "../../Common/TimePeriod";
 import useMobile from "../../Common/Hooks/Mobile";
 import useChangeEffect from "../../Common/Hooks/ChangeEffect";
 import useEscape from "../../Common/Hooks/Escape";
 import Hover from "../../Components/Hover";
 import PeriodSelector, {
     getPeriodNextDatetime,
-    getPeriodPreviousDatetime, getPeriodStartDatetime,
+    getPeriodStartDatetime,
     SelectableTimePeriod
 } from "../../Components/TimePeriod/PeriodSelector";
 import PeriodDropdown from "../../Components/TimePeriod/PeriodDropdown";
@@ -174,14 +174,6 @@ function ActionsRow({device, spoofedDevice, setSpoofedDevice}: {
     );
 }
 
-const FORMAT_UNITS = new Map<TimePeriod, { value: TimePeriod, label: string }[]>([
-    [TimePeriod.Month, [{value: TimePeriod.Day, label: 'days'}, {value: TimePeriod.Hour, label: 'hr'}]],
-    [TimePeriod.Week, [{value: TimePeriod.Day, label: 'days'}, {value: TimePeriod.Hour, label: 'hr'}]],
-    [TimePeriod.Day, [{value: TimePeriod.Hour, label: 'hr'}, {value: TimePeriod.Minute, label: 'min'}]],
-    [TimePeriod.Hour, [{value: TimePeriod.Minute, label: 'min'}]],
-    [TimePeriod.Minute, [{value: TimePeriod.Minute, label: 'min'}]],
-]);
-
 const PERIOD_OPTIONS = [
     {label: 'Month', value: TimePeriod.Month},
     {label: 'Week', value: TimePeriod.Week},
@@ -189,24 +181,13 @@ const PERIOD_OPTIONS = [
     {label: 'Hour', value: TimePeriod.Hour},
 ]
 
-function formatUptime(scalePeriod: TimePeriod, timeInterval: number) {
-    if (!FORMAT_UNITS.has(scalePeriod)) {
-        throw Error('Unsupported time period');
-    }
-    const units = FORMAT_UNITS.get(scalePeriod);
-    const sizeUnitStrings: string[] = [];
-    units?.forEach(unit => {
-        if (timeInterval > unit.value) {
-            const unitSize = (timeInterval / unit.value) | 0;
-            sizeUnitStrings.push(`${unitSize} ${unit.label}`);
-            timeInterval -= unitSize * unit.value;
-        }
-    });
-    if (sizeUnitStrings.length === 0) {
-        return `0${units?.[units?.length - 1].label}`;
-    }
-    return sizeUnitStrings.join(', ');
-}
+const PERIOD_TO_INTERVAL = new Map([
+    [TimePeriod.Year, TimePeriod.Month],
+    [TimePeriod.Month, TimePeriod.Day],
+    [TimePeriod.Week, TimePeriod.Day],
+    [TimePeriod.Day, TimePeriod.Hour],
+    [TimePeriod.Hour, TimePeriod.Minute],
+]);
 
 function formatData(interval: TimePeriod, data: { time: Date, uptime: number }[]) {
     return data.map(item => ({
@@ -234,7 +215,7 @@ function UptimeHistoryChart({interval, data, barClickCallback}: { interval: Time
                 borderRadius: 8
             }}>
                 <div>{label}</div>
-                <div style={{color: '#b3e5fc'}}>uptime: {formatUptime(interval, payload[0].value)}</div>
+                <div style={{color: '#b3e5fc'}}>uptime: {formatInterval(interval, payload[0].value)}</div>
             </div>
         );
     }
@@ -274,21 +255,11 @@ function UptimeHistory({mac}: { mac: string }) {
     const [endDatetime, setEndDatetime] = useState<Date>(new Date());
     const [interval, setInterval] = useState<TimePeriod>(TimePeriod.Hour);
 
-    function setPrevious() {
-        setStartDatetime(getPeriodPreviousDatetime(startDatetime, period));
-        setEndDatetime(getPeriodPreviousDatetime(endDatetime, period));
-    }
-
-    function setNext() {
-        setStartDatetime(getPeriodNextDatetime(startDatetime, period));
-        setEndDatetime(getPeriodNextDatetime(endDatetime, period));
-    }
-
     function setPeriodAndInterval(period: TimePeriod) {
         setPeriod(period);
-        const units = FORMAT_UNITS.get(period);
-        if (units && units[0]) {
-            setInterval(units[0].value);
+        const interval = PERIOD_TO_INTERVAL.get(period);
+        if (interval) {
+            setInterval(interval);
         }
         const newStartDatetime = getPeriodStartDatetime(period);
         setStartDatetime(newStartDatetime);
@@ -322,11 +293,7 @@ function UptimeHistory({mac}: { mac: string }) {
         if (interval === TimePeriod.Minute) {
             return;
         }
-        const units = FORMAT_UNITS.get(period);
-        if (!units || !units[0]) {
-            return;
-        }
-        const newPeriod = units[0].value;
+        const newPeriod = interval;
         setPeriodAndInterval(newPeriod);
         setStartDatetime(value);
         setEndDatetime(getPeriodNextDatetime(value, newPeriod));
@@ -349,9 +316,9 @@ function UptimeHistory({mac}: { mac: string }) {
                                         setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} height={34}
                                         arrowSize={18}/>
                         <PeriodSelector style={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
-                                        startDatetime={startDatetime}
-                                        setPrevious={setPrevious}
-                                        setNext={setNext} height={32} iconFontSize={22}/>
+                                        startDatetime={startDatetime} setStartDatetime={setStartDatetime}
+                                        endDatetime={endDatetime} setEndDatetime={setEndDatetime}
+                                        height={32} iconFontSize={22}/>
                     </div>
                 </div>
                 <UptimeHistoryChart interval={interval} data={history} barClickCallback={barClickCallback}/>
