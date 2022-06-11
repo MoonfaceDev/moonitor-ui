@@ -1,6 +1,6 @@
 import React, {ChangeEventHandler, CSSProperties, HTMLInputTypeAttribute, useState} from "react";
-import {Hover} from "../Dashboard/Components";
 import useMobile from "../Common/Hooks/Mobile";
+import Hover from "./Hover";
 
 function ErrorLabel({children, visible}: { children: string, visible: boolean }) {
     return <div style={{

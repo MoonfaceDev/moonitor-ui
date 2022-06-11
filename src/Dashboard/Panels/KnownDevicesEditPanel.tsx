@@ -1,11 +1,12 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {DialogBox, DialogHeader} from "../Components";
 import MonacoEditor, {OnValidate} from "@monaco-editor/react";
 import {fetchUpdateDevicesConfig, fetchViewDevicesConfig} from "../../APIRequests";
-import Loading from "../../Loading/Loading";
+import Loading from "../../Components/Loading/Loading";
 import {useSnackbar} from "notistack";
 import useMobile from "../../Common/Hooks/Mobile";
 import useEscape from "../../Common/Hooks/Escape";
+import DialogBox from "../../Components/Dialog/DialogBox";
+import DialogHeader from "../../Components/Dialog/DialogHeader";
 
 function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closePanel: () => void }) {
     const isMobile = useMobile();

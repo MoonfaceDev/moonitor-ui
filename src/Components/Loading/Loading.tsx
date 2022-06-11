@@ -1,5 +1,5 @@
 import React from 'react';
-import loading from '../Assets/loading.png';
+import loading from '../../Assets/loading.png';
 import './Loading.css'
 
 

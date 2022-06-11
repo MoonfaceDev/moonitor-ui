@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import {PanelContainer, ProgressBar} from "../Components";
 import {IconButton} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import {fetchKnownDevicesCount} from "../../APIRequests";
@@ -7,6 +6,8 @@ import {POLL_INTERVAL} from "../../config";
 import KnownDevicesEditPanel from "./KnownDevicesEditPanel";
 import useMobile from "../../Common/Hooks/Mobile";
 import useInterval from "../../Common/Hooks/Interval";
+import PanelContainer from "../../Components/Panel/PanelContainer";
+import ProgressBar from "../../Components/ProgressBar";
 
 function KnownDevicesPanel({totalDevices}: { totalDevices: number }) {
     const isMobile = useMobile();

@@ -1,9 +1,9 @@
 import React, {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import Loading from "../Loading/Loading";
-import {ErrorLabel, InputField, SpecialButton} from "./AuthenticationComponents";
-import {Hover} from "../Dashboard/Components";
+import Loading from "../Components/Loading/Loading";
+import {ErrorLabel, InputField, SpecialButton} from "../Components/AuthenticationComponents";
 import {APIError, fetchLogin} from "../APIRequests";
+import Hover from "../Components/Hover";
 
 function Header() {
     const navigate = useNavigate();

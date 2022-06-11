@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {fetchSpoof, fetchSpoofedDevice} from "../../APIRequests";
 import DeviceDetailsPanel from "./DeviceDetailsPanel";
-import Loading from "../../Loading/Loading";
+import Loading from "../../Components/Loading/Loading";
 import {TYPES} from "../../config";
-import {Hover} from "../Components";
 import {DEFAULT_DEVICE, Device, getLastSeenTime, isOnline, sortDevices} from "../../Common/Device";
 import {DEFAULT_SPOOFED_DEVICE, SpoofedDevice} from "../../Common/SpoofedDevice";
 import useMobile from "../../Common/Hooks/Mobile";
+import Hover from "../../Components/Hover";
 
 function DeviceView({device, spoofedDevice, openDetails}: {
     device: Device,

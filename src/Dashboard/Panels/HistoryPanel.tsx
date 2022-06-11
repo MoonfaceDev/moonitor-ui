@@ -1,20 +1,18 @@
 import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import React, {useEffect, useState} from "react";
-import {
-    PanelContainer,
-    ChartTitle,
-    getPeriodNextDatetime,
-    getPeriodPreviousDatetime,
-    getPeriodStartDatetime,
-    PeriodDropdown,
-    PeriodSelector,
-    SelectableTimePeriod,
-} from "../Components";
 import {fetchHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
 import {formatDate, TimePeriod} from "../../Common/TimePeriod";
 import useMobile from "../../Common/Hooks/Mobile";
 import useChangeEffect from "../../Common/Hooks/ChangeEffect";
+import PeriodSelector, {
+    getPeriodNextDatetime,
+    getPeriodPreviousDatetime, getPeriodStartDatetime,
+    SelectableTimePeriod
+} from "../../Components/TimePeriod/PeriodSelector";
+import PanelContainer from "../../Components/Panel/PanelContainer";
+import ChartTitle from "../../Components/Panel/ChartTitle";
+import PeriodDropdown from "../../Components/TimePeriod/PeriodDropdown";
 
 function formatData(interval: TimePeriod, data: { time: Date, average: number }[]) {
     return data.map(item => ({time: formatDate(interval, item.time), average: item.average.toFixed(1)}))

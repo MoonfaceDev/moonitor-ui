@@ -1,20 +1,9 @@
 import React, {CSSProperties, useEffect, useState} from "react";
-import {
-    DialogBox,
-    DialogHeader,
-    getPeriodNextDatetime,
-    getPeriodPreviousDatetime,
-    getPeriodStartDatetime,
-    Hover,
-    PeriodDropdown,
-    PeriodSelector,
-    SelectableTimePeriod
-} from "../Components";
 import {Bar, BarChart, ResponsiveContainer, Tooltip, TooltipProps, XAxis} from "recharts";
 import {fetchUptimeHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
-import Loading from "../../Loading/Loading";
+import Loading from "../../Components/Loading/Loading";
 import '../BulletList.css';
 import {Device, getLastSeenTime, isOnline} from "../../Common/Device";
 import {DEFAULT_SPOOFED_DEVICE, SpoofedDevice} from "../../Common/SpoofedDevice";
@@ -22,6 +11,15 @@ import {formatDate, TimePeriod} from "../../Common/TimePeriod";
 import useMobile from "../../Common/Hooks/Mobile";
 import useChangeEffect from "../../Common/Hooks/ChangeEffect";
 import useEscape from "../../Common/Hooks/Escape";
+import Hover from "../../Components/Hover";
+import PeriodSelector, {
+    getPeriodNextDatetime,
+    getPeriodPreviousDatetime, getPeriodStartDatetime,
+    SelectableTimePeriod
+} from "../../Components/TimePeriod/PeriodSelector";
+import PeriodDropdown from "../../Components/TimePeriod/PeriodDropdown";
+import DialogBox from "../../Components/Dialog/DialogBox";
+import DialogHeader from "../../Components/Dialog/DialogHeader";
 
 function OnlineRow({device}: { device: Device }) {
     const online = isOnline(device);
