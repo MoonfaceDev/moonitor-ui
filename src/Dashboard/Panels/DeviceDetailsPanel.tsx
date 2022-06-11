@@ -7,11 +7,13 @@ import {
     SpoofedDevice,
     TimePeriod,
     useChangeEffect,
+    useEscape,
     useMobile
 } from "../../Utils";
 import React, {CSSProperties, useEffect, useState} from "react";
 import {
-    DialogBox, DialogHeader,
+    DialogBox,
+    DialogHeader,
     getPeriodNextDatetime,
     getPeriodPreviousDatetime,
     getPeriodStartDatetime,
@@ -441,19 +443,7 @@ function DeviceDetailsPanel({device, spoofedDevice, setSpoofedDevice, visible, c
     visible: boolean,
     closePanel: () => void
 }) {
-    useEffect(() => {
-        const close = (event: { keyCode: number; }) => {
-            if (event.keyCode === 27) {
-                closePanel();
-            }
-        }
-        if (visible) {
-            window.addEventListener('keydown', close);
-        } else {
-            window.removeEventListener('keydown', close);
-        }
-        return () => window.removeEventListener('keydown', close);
-    }, [visible]);
+    useEscape(() => closePanel(), visible);
     return (
         <DialogBox visible={visible}>
             <DialogHeader title={device.name} onCancel={closePanel}/>

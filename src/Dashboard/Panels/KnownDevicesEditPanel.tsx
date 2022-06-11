@@ -3,7 +3,7 @@ import {DialogBox, DialogHeader} from "../Components";
 import MonacoEditor, {OnValidate} from "@monaco-editor/react";
 import {fetchUpdateDevicesConfig, fetchViewDevicesConfig} from "../../APIRequests";
 import Loading from "../../Loading/Loading";
-import {useMobile} from "../../Utils";
+import {useEscape, useMobile} from "../../Utils";
 import {useSnackbar} from "notistack";
 
 function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closePanel: () => void }) {
@@ -11,6 +11,8 @@ function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closeP
     const [data, setData] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [valid, setValid] = useState<boolean>(true);
+    const [obscured, setObscured] = useState<boolean>(false);
+    const [waitingToSave, setWaitingToSave] = useState<boolean>(false);
     const [errors, setErrors] = useState<string[]>([]);
     const {enqueueSnackbar} = useSnackbar();
 
@@ -27,7 +29,20 @@ function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closeP
             });
     }, [visible]);
 
+    useEscape(() => closePanel(), visible);
+
+    useEffect(() => {
+        if (!obscured && waitingToSave) {
+            setWaitingToSave(false);
+            saveData();
+        }
+    }, [obscured, waitingToSave]);
+
     const saveData = useCallback(() => {
+        if (obscured) {
+            setWaitingToSave(true);
+            return;
+        }
         if (!valid) {
             enqueueSnackbar(errors.join('\n'), {variant: 'error'});
             return;
@@ -43,7 +58,7 @@ function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closeP
                 setLoading(false);
                 enqueueSnackbar(reason, {variant: 'error'});
             });
-    }, [valid, errors, data]);
+    }, [valid, obscured, errors, data]);
 
     const handleEditorValidation: OnValidate = useCallback((markers) => {
         const errorMessages = markers.map(
@@ -51,6 +66,7 @@ function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closeP
         );
         setValid(errorMessages.length === 0);
         setErrors(errorMessages);
+        setObscured(false);
     }, []);
     return (
         <>
@@ -71,11 +87,14 @@ function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closeP
                         theme="vs-dark"
                         value={data}
                         height={isMobile ? 400 : 600}
-                        onChange={data => {
-                            if (data === undefined) {
+                        onChange={(newData) => {
+                            if (newData === undefined) {
                                 return;
                             }
-                            setData(data);
+                            if (data !== '') {
+                                setObscured(true);
+                            }
+                            setData(newData);
                         }}
                         onValidate={handleEditorValidation}
                         beforeMount={(monaco) => {

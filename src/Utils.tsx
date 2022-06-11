@@ -93,6 +93,22 @@ function useInterval(func: () => void, timeInterval: number, deps?: DependencyLi
     }, deps);
 }
 
+function useEscape(callback: () => void, enabled: boolean) {
+    return useEffect(() => {
+        const close = (event: { keyCode: number; }) => {
+            if (event.keyCode === 27) {
+                callback();
+            }
+        }
+        if (enabled) {
+            window.addEventListener('keydown', close);
+        } else {
+            window.removeEventListener('keydown', close);
+        }
+        return () => window.removeEventListener('keydown', close);
+    }, [enabled]);
+}
+
 function getTokenExpirationDelta() {
     const user = localStorage.user;
     const token = JSON.parse(user).access_token;
@@ -126,6 +142,7 @@ export {
     useChangeEffect,
     useTimeout,
     useInterval,
+    useEscape,
     getTokenExpirationDelta,
     TimePeriod,
     INTERVAL_TO_FORMAT,
