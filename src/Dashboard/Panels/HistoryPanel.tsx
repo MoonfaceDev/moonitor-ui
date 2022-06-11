@@ -1,6 +1,5 @@
 import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import React, {useEffect, useState} from "react";
-import {INTERVAL_TO_FORMAT, TimePeriod, useChangeEffect, useMobile} from "../../Utils";
 import {
     PanelContainer,
     ChartTitle,
@@ -13,10 +12,9 @@ import {
 } from "../Components";
 import {fetchHistory} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
-
-function formatDate(interval: TimePeriod, date: Date) {
-    return date.toLocaleString('en-GB', INTERVAL_TO_FORMAT.get(interval));
-}
+import {formatDate, TimePeriod} from "../../Common/TimePeriod";
+import useMobile from "../../Common/Hooks/Mobile";
+import useChangeEffect from "../../Common/Hooks/ChangeEffect";
 
 function formatData(interval: TimePeriod, data: { time: Date, average: number }[]) {
     return data.map(item => ({time: formatDate(interval, item.time), average: item.average.toFixed(1)}))

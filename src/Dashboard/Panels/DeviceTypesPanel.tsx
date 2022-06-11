@@ -1,9 +1,10 @@
-import {Device, useMobile} from "../../Utils";
 import {Cell, Label, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipProps} from "recharts";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 import React, {useState} from "react";
 import {PanelContainer, ChartTitle} from "../Components";
 import {TYPES} from "../../config";
+import {Device} from "../../Common/Device";
+import useMobile from "../../Common/Hooks/Mobile";
 
 function countEntitiesOfType(onlineDevices: Device[], type: string) {
     let count = 0;

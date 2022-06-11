@@ -3,7 +3,7 @@ import {PanelContainer} from "../Components";
 import {Box, Icon, IconButton, InputBase, Paper, styled} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
-import {useMobile} from "../../Utils";
+import useMobile from "../../Common/Hooks/Mobile";
 
 const SearchPaper = styled(Paper)(({theme}) => ({
     background: theme.palette.primary.main,

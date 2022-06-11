@@ -1,4 +1,6 @@
-import {Device, SpoofedDevice, TimePeriod} from "./Utils";
+import {TimePeriod} from "./Common/TimePeriod";
+import {Device} from "./Common/Device";
+import {SpoofedDevice} from "./Common/SpoofedDevice";
 
 const ORIGIN = '<origin>';
 

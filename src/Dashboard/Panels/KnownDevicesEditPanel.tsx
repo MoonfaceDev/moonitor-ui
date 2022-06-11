@@ -3,8 +3,9 @@ import {DialogBox, DialogHeader} from "../Components";
 import MonacoEditor, {OnValidate} from "@monaco-editor/react";
 import {fetchUpdateDevicesConfig, fetchViewDevicesConfig} from "../../APIRequests";
 import Loading from "../../Loading/Loading";
-import {useEscape, useMobile} from "../../Utils";
 import {useSnackbar} from "notistack";
+import useMobile from "../../Common/Hooks/Mobile";
+import useEscape from "../../Common/Hooks/Escape";
 
 function KnownDevicesEditPanel({visible, closePanel}: { visible: boolean, closePanel: () => void }) {
     const isMobile = useMobile();

@@ -1,8 +1,10 @@
-import {INTERVAL_TO_FORMAT, TimePeriod, useChangeEffect, useMobile} from "../Utils";
 import Select, {components, GroupBase, StylesConfig} from "react-select";
 import React, {CSSProperties, ReactNode, useState} from "react";
 import {DropdownIndicatorProps} from "react-select/dist/declarations/src/components/indicators";
 import {PolarAngleAxis, RadialBar, RadialBarChart} from "recharts";
+import {INTERVAL_TO_FORMAT, TimePeriod} from "../Common/TimePeriod";
+import useMobile from "../Common/Hooks/Mobile";
+import useChangeEffect from "../Common/Hooks/ChangeEffect";
 
 function Hover({children, style, disabled}: { children: ReactNode, style?: CSSProperties | undefined, disabled?: boolean }) {
     const [buttonHover, setButtonHover] = useState(false);

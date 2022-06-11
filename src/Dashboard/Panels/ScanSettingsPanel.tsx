@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {PanelContainer, ProgressBar} from "../Components";
-import {useInterval, useMobile} from "../../Utils";
 import {IconButton} from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import {fetchLastScanDatetime, fetchScanInterval} from "../../APIRequests";
 import {POLL_INTERVAL} from "../../config";
+import useMobile from "../../Common/Hooks/Mobile";
+import useInterval from "../../Common/Hooks/Interval";
 
 function ScanSettingsPanel() {
     const isMobile = useMobile();

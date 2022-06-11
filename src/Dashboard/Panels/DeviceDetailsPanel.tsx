@@ -1,15 +1,3 @@
-import {
-    DEFAULT_SPOOFED_DEVICE,
-    Device,
-    getLastSeenTime,
-    INTERVAL_TO_FORMAT,
-    isOnline,
-    SpoofedDevice,
-    TimePeriod,
-    useChangeEffect,
-    useEscape,
-    useMobile
-} from "../../Utils";
 import React, {CSSProperties, useEffect, useState} from "react";
 import {
     DialogBox,
@@ -28,6 +16,12 @@ import {POLL_INTERVAL} from "../../config";
 import {NameType, ValueType} from "recharts/types/component/DefaultTooltipContent";
 import Loading from "../../Loading/Loading";
 import '../BulletList.css';
+import {Device, getLastSeenTime, isOnline} from "../../Common/Device";
+import {DEFAULT_SPOOFED_DEVICE, SpoofedDevice} from "../../Common/SpoofedDevice";
+import {formatDate, TimePeriod} from "../../Common/TimePeriod";
+import useMobile from "../../Common/Hooks/Mobile";
+import useChangeEffect from "../../Common/Hooks/ChangeEffect";
+import useEscape from "../../Common/Hooks/Escape";
 
 function OnlineRow({device}: { device: Device }) {
     const online = isOnline(device);
@@ -214,10 +208,6 @@ function formatUptime(scalePeriod: TimePeriod, timeInterval: number) {
         return `0${units?.[units?.length - 1].label}`;
     }
     return sizeUnitStrings.join(', ');
-}
-
-function formatDate(interval: TimePeriod, date: Date) {
-    return date.toLocaleString('en-GB', INTERVAL_TO_FORMAT.get(interval));
 }
 
 function formatData(interval: TimePeriod, data: { time: Date, uptime: number }[]) {

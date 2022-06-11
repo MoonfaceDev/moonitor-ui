@@ -4,13 +4,16 @@ import DeviceTypesPanel from "./Panels/DeviceTypesPanel";
 import HistoryPanel from "./Panels/HistoryPanel";
 import {useMediaQuery} from 'react-responsive';
 import AllDevicesPanel from "./Panels/AllDevicesPanel";
-import {Device, getTokenExpirationDelta, isOnline, useInterval, useTimeout} from "../Utils";
 import {fetchDevices} from "../APIRequests";
 import {POLL_INTERVAL} from "../config";
 import {useNavigate} from "react-router-dom";
 import SearchPanel from "./Panels/SearchPanel";
 import KnownDevicesPanel from "./Panels/KnownDevicesPanel";
 import ScanSettingsPanel from "./Panels/ScanSettingsPanel";
+import {Device, isOnline} from "../Common/Device";
+import useInterval from "../Common/Hooks/Interval";
+import useTimeout from "../Common/Hooks/Timeout";
+import {getTokenExpirationDelta} from "../Common/Token";
 
 function Header() {
     return <div style={{minHeight: 100}}>
