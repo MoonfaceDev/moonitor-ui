@@ -23,7 +23,7 @@ function SearchPanel({query, setQuery}: { query: string, setQuery: (query: strin
                     <SearchPaper
                         sx={{p: '2px 4px', display: 'flex', alignItems: 'center'}}
                     >
-                        <Icon sx={{p: '10px'}}>
+                        <Icon sx={{p: '10px', boxSizing: 'content-box'}}>
                             <SearchIcon/>
                         </Icon>
                         <InputBase

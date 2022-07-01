@@ -2,7 +2,9 @@ import {TimePeriod} from "./Common/TimePeriod";
 import {Device} from "./Common/Device";
 import {SpoofedDevice} from "./Common/SpoofedDevice";
 
-const ORIGIN = '<origin>';
+// const ORIGIN = '<origin>';
+
+const ORIGIN = 'https://moonitor.sytes.net';
 
 class APIError extends Error {
     constructor(detail: any) {
@@ -33,10 +35,10 @@ async function fetchUptimeHistory(mac: string, startDatetime: Date, endDatetime:
     }));
 }
 
-async function fetchHistory(startDatetime: Date, endDatetime: Date, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, average: number }[]> {
+async function fetchHistory(startDatetime: Date, endDatetime: Date, interval: TimePeriod = TimePeriod.Hour): Promise<{ time: Date, average: number | null }[]> {
     const response = await fetch(`${ORIGIN}/api/device/all/history?start_timestamp=${startDatetime.getTime() / 1000}&end_timestamp=${endDatetime.getTime() / 1000}&time_interval=${interval}`, {headers: authHeader()});
     const data = await response.json();
-    return data.map((item: { time: string, average: number }) => ({
+    return data.map((item: { time: string, average: number | null }) => ({
         time: new Date(item.time),
         average: item.average,
     }));
@@ -128,7 +130,11 @@ async function fetchViewDevicesConfig() {
 async function fetchUpdateDevicesConfig(data: string) {
     const response = await fetch(
         `${ORIGIN}/api/devices_config/update`,
-        {method: 'post', headers: [...authHeader(), ['Content-Type', 'application/json']], body: JSON.stringify({data: data})}
+        {
+            method: 'post',
+            headers: [...authHeader(), ['Content-Type', 'application/json']],
+            body: JSON.stringify({data: data})
+        }
     );
     if (response.status !== 200) {
         const data = await response.text();
@@ -182,7 +188,8 @@ async function fetchSettings(): Promise<Settings> {
 async function fetchUpdateSettings(settings: Settings) {
     const response = await fetch(
         `${ORIGIN}/api/settings/update`,
-        {method: 'post', headers: [...authHeader(), ['Content-Type', 'application/json']], body: JSON.stringify({
+        {
+            method: 'post', headers: [...authHeader(), ['Content-Type', 'application/json']], body: JSON.stringify({
                 scan_settings: {
                     network_subnet: settings.scanSettings.networkSubnet,
                     scan_interval: settings.scanSettings.scanInterval,
@@ -193,7 +200,8 @@ async function fetchUpdateSettings(settings: Settings) {
                     gateway_ip: settings.serverSettings.gatewayIp,
                     gateway_mac: settings.serverSettings.gatewayMac,
                 }
-            })}
+            })
+        }
     );
     if (response.status !== 200) {
         const data = await response.text();

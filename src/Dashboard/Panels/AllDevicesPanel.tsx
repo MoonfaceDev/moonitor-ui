@@ -7,6 +7,44 @@ import {DEFAULT_DEVICE, Device, getLastSeenTime, isOnline, sortDevices} from "..
 import {DEFAULT_SPOOFED_DEVICE, SpoofedDevice} from "../../Common/SpoofedDevice";
 import useMobile from "../../Common/Hooks/Mobile";
 import Hover from "../../Components/Hover";
+import Badge from "@mui/material/Badge"
+import {Box, styled} from "@mui/material";
+
+const StyledBadge = styled(Badge)(({theme}) => ({
+    '& .MuiBadge-badge': {
+        backgroundColor: '#44b700',
+        color: '#44b700',
+        boxShadow: `0 0 0 5px ${theme.palette.background.paper}`,
+        width: 16,
+        height: 16,
+        borderRadius: '50%',
+        bottom: '20%',
+        right: '20%',
+        zIndex: 'unset',
+        '&::after': {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            animation: 'ripple 1.2s infinite ease-in-out',
+            border: '2px solid currentColor',
+            content: '""',
+            boxSizing: 'border-box',
+        },
+    },
+    '@keyframes ripple': {
+        '0%': {
+            transform: 'scale(.8)',
+            opacity: 1,
+        },
+        '100%': {
+            transform: 'scale(2)',
+            opacity: 0,
+        },
+    },
+}));
 
 function DeviceView({device, spoofedDevice, openDetails}: {
     device: Device,
@@ -22,7 +60,7 @@ function DeviceView({device, spoofedDevice, openDetails}: {
                      background: '#27293D',
                      color: '#D3D1D8',
                      borderRadius: 16,
-                     margin: 8,
+                     margin: 12,
                      userSelect: "none",
                  }}>
                 <Hover style={{
@@ -32,29 +70,25 @@ function DeviceView({device, spoofedDevice, openDetails}: {
                     padding: 8,
                     borderRadius: 16,
                 }}>
-                    <div className='material-symbols-outlined' style={{
-                        position: 'relative',
-                        background: '#3C3F5E',
-                        borderRadius: '50%',
-                        margin: 8,
-                        padding: 12,
-                        fontSize: 40,
-                    }}>
-                        {TYPES.get(device.type)?.icon}
-                        {
-                            online ?
-                                <div style={{
-                                    position: 'absolute',
-                                    right: 0,
-                                    bottom: 0,
-                                    background: '#00B050',
-                                    borderRadius: '50%',
-                                    width: 16,
-                                    height: 16
-                                }}/>
-                                : null
-                        }
-                    </div>
+                    <StyledBadge
+                        overlap="circular"
+                        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                        variant="dot"
+                        invisible={!online}
+                    >
+                        <Box sx={{
+                            position: 'relative',
+                            background: '#3C3F5E',
+                            borderRadius: '50%',
+                            margin: 1,
+                            padding: 1.5,
+                            width: 40,
+                            height: 40,
+                            boxSizing: 'content-box',
+                        }}>
+                            {TYPES.get(device.type)?.icon({sx: {fontSize: 40}})}
+                        </Box>
+                    </StyledBadge>
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',

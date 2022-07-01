@@ -14,11 +14,14 @@ import PanelContainer from "../../Components/Panel/PanelContainer";
 import PanelTitle from "../../Components/Panel/PanelTitle";
 import PeriodDropdown from "../../Components/TimePeriod/PeriodDropdown";
 
-function formatData(interval: TimePeriod, data: { time: Date, average: number }[]) {
-    return data.map(item => ({time: formatDate(interval, item.time), average: item.average.toFixed(1)}))
+function formatData(interval: TimePeriod, data: { time: Date, average: number | null }[]) {
+    return data.map(item => ({
+        time: formatDate(interval, item.time),
+        average: item.average ? item.average.toFixed(1) : null
+    }))
 }
 
-function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Date, average: number }[] }) {
+function HistoryChart({interval, data}: { interval: TimePeriod, data: { time: Date, average: number | null }[] }) {
     const formattedData = formatData(interval, data);
     return (
         <ResponsiveContainer width='100%' height='100%'>
@@ -65,7 +68,7 @@ const PERIOD_TO_INTERVAL = new Map([
 
 function HistoryPanel() {
     const isMobile = useMobile();
-    const [history, setHistory] = useState<{ time: Date, average: number }[]>([]);
+    const [history, setHistory] = useState<{ time: Date, average: number | null }[]>([]);
     const [period, setPeriod] = useState<SelectableTimePeriod>(TimePeriod.Day);
     const [startDatetime, setStartDatetime] = useState<Date>(new Date());
     const [endDatetime, setEndDatetime] = useState<Date>(new Date());

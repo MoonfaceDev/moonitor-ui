@@ -312,7 +312,7 @@ function UptimeHistory({mac}: { mac: string }) {
                               style={{flex: 1}}/>
                     <div style={{display: 'flex', paddingRight: 8}}>
                         <PeriodDropdown containerStyle={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
-                                        setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} height={34}
+                                        setPeriod={setPeriodAndInterval} options={PERIOD_OPTIONS} height={32}
                                         arrowSize={18}/>
                         <PeriodSelector style={{margin: isMobile ? '0 4px' : '0 8px'}} period={period}
                                         startDatetime={startDatetime} setStartDatetime={setStartDatetime}
@@ -348,16 +348,6 @@ function DetailsContent({device, spoofedDevice, setSpoofedDevice}: {
             // @ts-ignore
             overflowY: 'overlay',
             overflowX: 'hidden',
-            '*::-webkit-scrollbar': {
-                width: '0.4em'
-            },
-            '*::-webkit-scrollbar-track': {
-                '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
-            },
-            '*::-webkit-scrollbar-thumb': {
-                backgroundColor: 'rgba(0,0,0,.1)',
-                outline: '1px solid slategrey'
-            }
         }}>
             <OnlineRow device={device}/>
             <Divider/>

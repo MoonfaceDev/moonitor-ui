@@ -6,6 +6,7 @@
     margin-right: 16px;
     margin-bottom: 0;
     color: #c6c9ec;
+    box-sizing: content-box;
 }
 
 .bullet-list:before {

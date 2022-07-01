@@ -60,14 +60,14 @@ function SettingsEditPanel({visible, closePanel}: { visible: boolean, closePanel
     const {enqueueSnackbar} = useSnackbar();
 
     const [networkSubnet, setNetworkSubnet] = useState<string>('');
-    const [scanInterval, setScanInterval] = useState<number>(0);
-    const [portsToScan, setPortsToScan] = useState<number>(0);
+    const [scanInterval, setScanInterval] = useState<number>(300);
+    const [portsToScan, setPortsToScan] = useState<number>(100);
 
-    const [tokenExpiryTime, setTokenExpiryTime] = useState<number>(0);
+    const [tokenExpiryTime, setTokenExpiryTime] = useState<number>(30);
     const [gatewayIp, setGatewayIp] = useState<string>('');
     const [gatewayMac, setGatewayMac] = useState<string>('');
 
-    const [syncDataInterval, setSyncDataInterval] = useState<number>(0);
+    const [syncDataInterval, setSyncDataInterval] = useState<number>(300);
 
     useEffect(() => {
         if (!visible) {
@@ -147,16 +147,6 @@ function SettingsEditPanel({visible, closePanel}: { visible: boolean, closePanel
                     // @ts-ignore
                     overflowY: 'overlay',
                     overflowX: 'hidden',
-                    '*::-webkit-scrollbar': {
-                        width: '0.4em'
-                    },
-                    '*::-webkit-scrollbar-track': {
-                        '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
-                    },
-                    '*::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(0,0,0,.1)',
-                        outline: '1px solid slategrey'
-                    }
                 }}>
                     <List
                         subheader={
@@ -188,8 +178,9 @@ function SettingsEditPanel({visible, closePanel}: { visible: boolean, closePanel
                                 onChange={(event) => setScanInterval(parseInt(event.target.value.toString()))}
                             >
                                 {
-                                    SCAN_INTERVAL_OPTIONS.map(([label, value]) => <MenuItem
-                                        value={value}>{label}</MenuItem>)
+                                    SCAN_INTERVAL_OPTIONS.map(([label, value]) =>
+                                        <MenuItem key={value} value={value}>{label}</MenuItem>
+                                    )
                                 }
                             </Select>
                         </ListItem>
@@ -204,7 +195,7 @@ function SettingsEditPanel({visible, closePanel}: { visible: boolean, closePanel
                                 onChange={(event) => setPortsToScan(parseInt(event.target.value.toString()))}
                             >
                                 {
-                                    PORTS_TO_SCAN.map(value => <MenuItem value={value}>{value}</MenuItem>)
+                                    PORTS_TO_SCAN.map(value => <MenuItem key={value} value={value}>{value}</MenuItem>)
                                 }
                             </Select>
                         </ListItem>
@@ -232,8 +223,9 @@ function SettingsEditPanel({visible, closePanel}: { visible: boolean, closePanel
                                 onChange={(event) => setTokenExpiryTime(parseInt(event.target.value.toString()))}
                             >
                                 {
-                                    TOKEN_EXPIRY_TIME_OPTIONS.map(([label, value]) => <MenuItem
-                                        value={value}>{label}</MenuItem>)
+                                    TOKEN_EXPIRY_TIME_OPTIONS.map(([label, value]) =>
+                                        <MenuItem key={value} value={value}>{label}</MenuItem>
+                                    )
                                 }
                             </Select>
                         </ListItem>
@@ -281,8 +273,9 @@ function SettingsEditPanel({visible, closePanel}: { visible: boolean, closePanel
                                 onChange={(event) => setSyncDataInterval(parseInt(event.target.value.toString()))}
                             >
                                 {
-                                    SYNC_DATA_INTERVAL_OPTIONS.map(([label, value]) => <MenuItem
-                                        value={value}>{label}</MenuItem>)
+                                    SYNC_DATA_INTERVAL_OPTIONS.map(([label, value]) =>
+                                        <MenuItem key={value} value={value}>{label}</MenuItem>
+                                    )
                                 }
                             </Select>
                         </ListItem>

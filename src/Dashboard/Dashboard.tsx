@@ -19,7 +19,7 @@ function Header() {
     return <div style={{minHeight: 100}}>
         <img src={logo} alt='Moonitor' style={{
             position: 'absolute',
-            height: 80,
+            height: 120,
             left: '50%',
             transform: 'translateX(-50%)',
             padding: 20,
@@ -69,7 +69,7 @@ function Dashboard() {
             <div style={{
                 display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
-                minHeight: isMobile ? 240 : 96,
+                minHeight: isMobile ? 260 : 104,
             }}>
                 <SearchPanel query={query} setQuery={setQuery}/>
                 <KnownDevicesPanel totalDevices={devices.length}/>

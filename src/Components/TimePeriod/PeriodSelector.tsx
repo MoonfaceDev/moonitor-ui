@@ -53,7 +53,7 @@ function getPeriodNextDatetime(datetime: Date, timePeriod: SelectableTimePeriod)
     return addPeriods(datetime, 1, timePeriod);
 }
 
-function PeriodSelector({period, startDatetime, setStartDatetime, endDatetime, setEndDatetime, style, height = 38, iconFontSize = 28}: { period: SelectableTimePeriod, startDatetime: Date, setStartDatetime: (value: Date) => void, endDatetime: Date, setEndDatetime: (value: Date) => void, style?: CSSProperties | undefined, height?: number | undefined, iconFontSize?: number | undefined }) {
+function PeriodSelector({period, startDatetime, setStartDatetime, endDatetime, setEndDatetime, style, height = 40, iconFontSize = 28}: { period: SelectableTimePeriod, startDatetime: Date, setStartDatetime: (value: Date) => void, endDatetime: Date, setEndDatetime: (value: Date) => void, style?: CSSProperties | undefined, height?: number | undefined, iconFontSize?: number | undefined }) {
     const isMobile = useMobile();
 
     const setPrevious = useCallback(() => {

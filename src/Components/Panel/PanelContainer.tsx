@@ -12,7 +12,7 @@ function PanelContainer({children, style}: { children: ReactNode, style?: CSSPro
             background: '#27293D',
             color: '#D3D1D8',
             borderRadius: 16,
-            margin: 8,
+            margin: 12,
             ...style
         }}>
             {children}
