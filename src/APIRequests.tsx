@@ -2,9 +2,9 @@ import {TimePeriod} from "./Common/TimePeriod";
 import {Device} from "./Common/Device";
 import {SpoofedDevice} from "./Common/SpoofedDevice";
 
-// const ORIGIN = '<origin>';
+const ORIGIN = '<origin>';
 
-const ORIGIN = 'https://moonitor.sytes.net';
+// const ORIGIN = 'https://moonitor.sytes.net';
 
 class APIError extends Error {
     constructor(detail: any) {
