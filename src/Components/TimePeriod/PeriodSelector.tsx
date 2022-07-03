@@ -1,7 +1,8 @@
 import {formatDate, TimePeriod} from "../../Common/TimePeriod";
 import React, {CSSProperties, useCallback} from "react";
 import useMobile from "../../Common/Hooks/Mobile";
-import Hover from "../Hover";
+import {IconButton} from "@mui/material";
+import {ChevronLeft, ChevronRight} from "@mui/icons-material";
 
 type SelectableTimePeriod =
     | typeof TimePeriod.Year
@@ -76,27 +77,17 @@ function PeriodSelector({period, startDatetime, setStartDatetime, endDatetime, s
             color: '#676a8a',
             ...style
         }}>
-            <Hover style={{borderRadius: '50%'}}>
-                        <span className='material-symbols-outlined'
-                              onClick={() => setPrevious()}
-                              style={{
-                                  userSelect: "none",
-                                  fontSize: iconFontSize,
-                                  padding: 4,
-                              }}>chevron_left</span>
-            </Hover>
+            <IconButton onClick={setPrevious}
+                        sx={{color: '#676a8a', fontSize: iconFontSize, width: height, height: height}}>
+                <ChevronLeft/>
+            </IconButton>
             <div style={{width: isMobile ? 60 : 100, textAlign: 'center'}}>
                 {formatDate(period, startDatetime)}
             </div>
-            <Hover style={{borderRadius: '50%'}}>
-                        <span className='material-symbols-outlined'
-                              onClick={() => setNext()}
-                              style={{
-                                  userSelect: "none",
-                                  fontSize: iconFontSize,
-                                  padding: 4,
-                              }}>chevron_right</span>
-            </Hover>
+            <IconButton onClick={setNext}
+                        sx={{color: '#676a8a', fontSize: iconFontSize, width: height, height: height}}>
+                <ChevronRight/>
+            </IconButton>
         </div>
     );
 }

@@ -3,11 +3,12 @@ import React, {CSSProperties} from "react";
 import useMobile from "../../Common/Hooks/Mobile";
 import Select, {components, GroupBase, StylesConfig} from "react-select";
 import {DropdownIndicatorProps} from "react-select/dist/declarations/src/components/indicators";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 type PeriodDropdownOption = { label: string, value: TimePeriod };
 
 
-function PeriodDropdown({period, setPeriod, options, containerStyle, controlStyle, height = 40, arrowSize = 20}: { period: TimePeriod, setPeriod: (period: TimePeriod) => void, options: PeriodDropdownOption[], containerStyle?: CSSProperties | undefined, controlStyle?: CSSProperties | undefined, height?: number | undefined, arrowSize?: number | undefined }) {
+function PeriodDropdown({period, setPeriod, options, containerStyle, controlStyle, height = 40, arrowSize = 24}: { period: TimePeriod, setPeriod: (period: TimePeriod) => void, options: PeriodDropdownOption[], containerStyle?: CSSProperties | undefined, controlStyle?: CSSProperties | undefined, height?: number | undefined, arrowSize?: number | undefined }) {
     const isMobile = useMobile();
     const styles: StylesConfig<PeriodDropdownOption, false> = {
         container: base => ({
@@ -38,15 +39,13 @@ function PeriodDropdown({period, setPeriod, options, containerStyle, controlStyl
         return (
             components.DropdownIndicator && (
                 <components.DropdownIndicator {...props}>
-                    <div className="material-symbols-outlined" style={{
+                    <ExpandMoreIcon sx={{
                         width: arrowSize,
                         height: arrowSize,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
-                    }}>
-                        expand_more
-                    </div>
+                    }}/>
                 </components.DropdownIndicator>
             )
         );

@@ -1,5 +1,7 @@
 import React from "react";
-import Hover from "../Hover";
+import {IconButton} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import DoneIcon from "@mui/icons-material/Done";
 
 function DialogHeader({title, onCancel, onConfirm}: { title: string, onCancel?: () => void, onConfirm?: () => void }) {
     return (
@@ -22,15 +24,9 @@ function DialogHeader({title, onCancel, onConfirm}: { title: string, onCancel?: 
                     </span>
             {
                 onCancel === undefined ? null :
-                    <Hover style={{margin: 8, borderRadius: '50%', zIndex: 1}}>
-                        <span className='material-symbols-outlined'
-                              onClick={() => onCancel()}
-                              style={{
-                                  userSelect: "none",
-                                  fontSize: 32,
-                                  padding: 4,
-                              }}>close</span>
-                    </Hover>
+                    <IconButton sx={{margin: 1, zIndex: 1}} size="small" onClick={onCancel}>
+                        <CloseIcon sx={{fontSize: 32}}/>
+                    </IconButton>
             }
             <div style={{
                 flex: 1,
@@ -39,15 +35,9 @@ function DialogHeader({title, onCancel, onConfirm}: { title: string, onCancel?: 
             }}>
                 {
                     onConfirm === undefined ? null :
-                        <Hover style={{margin: 8, borderRadius: '50%', zIndex: 1}}>
-                        <span className='material-symbols-outlined'
-                              onClick={() => onConfirm()}
-                              style={{
-                                  userSelect: "none",
-                                  fontSize: 32,
-                                  padding: 4,
-                              }}>done</span>
-                        </Hover>
+                        <IconButton sx={{margin: 1, zIndex: 1}} size="small" onClick={onConfirm}>
+                            <DoneIcon sx={{fontSize: 32}}/>
+                        </IconButton>
                 }
             </div>
         </div>
